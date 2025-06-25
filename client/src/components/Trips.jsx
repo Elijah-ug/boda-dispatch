@@ -33,7 +33,7 @@ export default function Trips() {
     }
   }
   console.log("trip info rider: ", tripInfo.rider)
-  // console.log("tripInfo.rider: ", tripInfo.rider);
+  console.log("Type of tripInfo.tripId: ", typeof(tripInfo.tripId));
   const trips = []
   return (
       <div>
@@ -43,7 +43,8 @@ export default function Trips() {
 
           <div className="border-b py-2 flex justify-between items-center gap-4" >
             <div>
-              <p>Trip #{tripInfo?.tripId + 1 }</p>
+              <p>Trip #{tripInfo?.tripId? (Number(tripInfo?.tripId) + 1) : null}
+              </p>
                 <p>Rider:
                   <span className="text-blue-400 pl-2">
                     {tripInfo?.rider?.slice(0, 7)}...{tripInfo?.rider?.slice(-5)}
