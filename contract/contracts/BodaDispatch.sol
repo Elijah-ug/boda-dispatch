@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.28;
 
-import "@chainlink/contracts/src/v0.8/automation/interfaces/KeeperCompatibleInterface.sol";
+import "@chainlink/contracts/src/v0.8/automation/interfaces/AutomationCompatibleInterface.sol";
 
-contract DecentralizedBodaDispatch is KeeperCompatibleInterface {
+contract DecentralizedBodaDispatch is AutomationCompatibleInterface {
     // ===> Trip Struct
     struct Trip {
         uint256 tripId;
@@ -29,6 +29,7 @@ contract DecentralizedBodaDispatch is KeeperCompatibleInterface {
 
     mapping(address => Rider) public riderProfiles;
     uint256 public nextRiderId;
+    address[] public allRiders;
 
     // ===> Client Struct
     struct Client {
@@ -73,7 +74,7 @@ contract DecentralizedBodaDispatch is KeeperCompatibleInterface {
             totalTrips: 0,
             isRegistered: true
         });
-
+        allRiders.push(msg.sender);
         emit RiderRegistered(msg.sender, nextRiderId);
         nextRiderId++;
     }
@@ -208,6 +209,10 @@ contract DecentralizedBodaDispatch is KeeperCompatibleInterface {
     function getTripDetails(uint256 _tripId) external view returns (Trip memory) {
         return trips[_tripId];
     }
+
+    function getAllRiders() external view returns (address[] memory) {
+    return allRiders;
+}
 
     // ===> Accept fallback ETH
     receive() external payable {}

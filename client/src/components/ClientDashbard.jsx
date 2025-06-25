@@ -47,9 +47,9 @@ const ClientDashbard = () => {
 
   {/* Grouped Sections */}
         {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> */}
-        <div className="flex justify-around items-baseline">
+        <div className="flex justify-around ">
           <div>
-        <div className="flex gap-10 my-4 text-white">
+        <div className="flex gap-10 mb-4 text-white justify-center">
           <NavLink to="deposit">Deposit</NavLink>
           <NavLink to="withdraw">Withdraw</NavLink>
             <NavLink to="trip">Initiate Trip</NavLink>
@@ -63,7 +63,7 @@ const ClientDashbard = () => {
           {/* Start Trip Section */}
           {/* <StartTrip /> */}
           {/* My Trips List */}
-          <div className="my-10 ">
+          <div className="my-10 ml-10">
             <Trips />
             </div>
           </div>

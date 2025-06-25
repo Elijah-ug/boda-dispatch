@@ -7,8 +7,11 @@ export const fetchRegisterRiderThunk = createAsyncThunk(
         try {
             const contract = await getContract();
             console.log(contract.target)
+            console.log("waiting waiting for interaction");
             const register = await contract.registerRider();
+            console.log("waiting fr register");
             await register.wait();
+            console.log("registered")
             toast.success("Client registered successifully!");
             console.log(register)
             return true;

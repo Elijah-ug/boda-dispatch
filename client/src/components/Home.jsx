@@ -27,12 +27,9 @@ export default function Home() {
           <div className="text-end mr-10 pt-4 ">
         <Wallet/>
       </div>
-      <h2 className="text-xl font-bold text-amber-300 text-center pt-5"
+      <h2 className="font-bold text-amber-400 text-center pt-5 text-4xl"
       >Decentralized Boda Boda Dispatch </h2>
 
-      {/* <button onClick={handleUpdateYield}
-      className="bg-amber-400 text-gray-700 px-4 py-2 cursor-pointer rounded shadow">Get Best</button> */}
-<NavLink to="register">Try It</NavLink>
       <div className=" p-6 flex items-center justify-center mt-10">
   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl w-full">
 

@@ -7,12 +7,14 @@ export const fetchClinetWithdrawThunk = createAsyncThunk(
         try {
             const contract = await getContract();
             const withdraw = await contract.clientWithdraw(amount);
-            await withdraw.wait()
+            await withdraw.wait();
+            console.log("Withdraw successful: ", withdraw);
             toast.success("Trip Completed successifully!");
             return start;
 
         } catch (error) {
-            rejectWithValue(error.message);
+            console.log("Transaction failed: ", error.message);
+            return rejectWithValue(error.message);
         }
     }
 )

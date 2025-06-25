@@ -9,10 +9,18 @@ export const fetchStartTripThunk = createAsyncThunk(
             const start = await contract.startTrip(rider, fare);
             await start.wait()
             toast.success("Trip Started successifully!");
-            return start;
+            console.log(start)
+             return {
+                hash: start.hash,
+                from: start.from,
+                to: start.to,
+                gasLimit: start.gasLimit.toString(), // Convert BigInts
+                value: start.value?.toString?.() ?? null, // if it has value
+              };
 
         } catch (error) {
-            rejectWithValue(error.message);
+            toast.error("Trip start Failed")
+            return rejectWithValue(error.message);
         }
     }
 )

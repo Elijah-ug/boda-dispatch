@@ -1,18 +1,24 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { fetchClientDepositThunk } from '../features/clients/deposit/depositThunk';
-import { ethers } from 'ethers';
+import { ethers, parseEther } from 'ethers';
+import { fetchClientProfileThunk } from '../features/clients/profiles/clientProfileThunk';
 
 export default function Deposit() {
     const [depositAmount, setDepositAmount] = useState('');
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
+  const { clientProfile } = useSelector((state) => state.client);
     const handleDeposit = () => {
 
         if (parseFloat(depositAmount) < 0 || isNaN(depositAmount)) {
           alert("Invalid Amount");
           return;
         }
-        dispatch(fetchClientDepositThunk({ amount: ethers.parseEther(depositAmount) }));
+      dispatch(fetchClientDepositThunk({ amount: parseEther(depositAmount.toString()) }));
+      dispatch(fetchClientProfileThunk({address}))
+      console.log("depositAmount: ", depositAmount)
+      console.log("Type of depositAmount: ", typeof (depositAmount))
+      setDepositAmount("");
       }
   return (
       <div>

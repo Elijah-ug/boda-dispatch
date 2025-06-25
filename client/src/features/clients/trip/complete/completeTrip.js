@@ -1,18 +1,26 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getContract } from "../../../contract/contract";
 import {toast} from "react-toastify"
+import { getContract } from "../../../../contract/contract";
 export const fetchCompleteTripThunk = createAsyncThunk(
-    "rider/fetchRegisterRiderThunk",
-    async (_, { rejectWithValue }) => {
+    "complete/fetchCompleteTripThunk",
+    async ({tripId}, { rejectWithValue }) => {
         try {
+            console.log('Calling completeTrip with id:', tripId);
             const contract = await getContract();
-            const start = await contract.completeTrip();
-            await start.wait()
+            const complete = await contract.completeTrip(tripId);
+            await complete.wait()
             toast.success("Trip Completed successifully!");
-            return start;
+            return {
+                hash: complete.hash,
+                from: complete.from,
+                to: complete.to,
+                gassLimit: complete.gassLimit?.toString() || "N/A",
+            };
 
         } catch (error) {
-            rejectWithValue(error.message);
+            toast.error("Trip completeion failed");
+            console.log("Error: " + error.message);
+            return rejectWithValue(error.message);
         }
     }
 )

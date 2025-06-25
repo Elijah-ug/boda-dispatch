@@ -1,17 +1,20 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getContract } from "../../../contract/contract";
 import {toast} from "react-toastify"
+import { fetchClientProfileThunk } from "../profiles/clientProfileThunk";
 export const fetchClientDepositThunk = createAsyncThunk(
-    "rider/fetchRegisterRiderThunk",
-    async ({amount}, { rejectWithValue }) => {
+    "deposit/fetchClientDepositThunk",
+    async ({amount}, { rejectWithValue, dispatch }) => {
         try {
             const contract = await getContract();
-            const register = await contract.clientDeposit(amount);
-            await register.wait();
-            toast.success("Client registered successifully!");
-
+            const deposit = await contract.clientDeposit({value: amount});
+            await deposit.wait();
+            console.log("client deposited: ", deposit)
+            toast.success("Client deposited successifully!");
+            dispatch(fetchClientProfileThunk(user));
         } catch (error) {
-            rejectWithValue(error.message);
+            console.log("Transaction Failed", error.message);
+           return rejectWithValue(error.message);
         }
     }
 )
