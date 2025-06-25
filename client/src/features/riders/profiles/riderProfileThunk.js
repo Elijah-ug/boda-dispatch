@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getContract } from "../../../contract/contract";
 import { toast } from "react-toastify";
+import { formatEther } from "ethers";
 
 export const fetchRiderProfileThunk = createAsyncThunk(
   "rider/fetchRiderProfileThunk",
@@ -13,7 +14,7 @@ export const fetchRiderProfileThunk = createAsyncThunk(
       const riderData = {
         riderId: riderInfo[0].toString(),
         user: riderInfo[1],
-        earnings: riderInfo[2].toString(),
+        earnings: formatEther(riderInfo[2].toString()),
         stars: riderInfo[3].toString(),
         totalTrips: riderInfo[4].toString(),
         isRegistered: riderInfo[5]
@@ -23,7 +24,6 @@ export const fetchRiderProfileThunk = createAsyncThunk(
       return riderData;
     } catch (error) {
       console.error("❌ Error fetching client info", error.message);
-      toast.error("Failed to fetch rider info");
       return rejectWithValue(error.message);
     }
   }

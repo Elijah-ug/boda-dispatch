@@ -2,18 +2,33 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchRiderProfileThunk } from "../features/riders/profiles/riderProfileThunk";
 import { autoConnectWallet } from "../features/wallet/connectWallet";
+import { fetchTripThunk } from "../features/clients/trip/tripData/tripThunk";
+import { fetchCurrentTripId } from "../features/clients/trip/tripData/currentTripIdThunk";
 
 const RiderDashboard = ({ riderData, assignedTrips, onWithdraw }) => {
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const dispatch = useDispatch();
   const { riderProfile } = useSelector((state) => state.rider);
+  const { tripInfo } = useSelector((state) => state.trips);
   const { address } = useSelector((state) => state.auth);
   console.log("riderProfile.isRegistered: ", riderProfile.isRegistered)
 
   useEffect(() => {
     dispatch(autoConnectWallet());
     dispatch(fetchRiderProfileThunk({ address }));
+
   }, [address])
+  useEffect(() => {
+    dispatch(fetchCurrentTripId())
+        .unwrap()
+        .then((tripId) => {
+          dispatch(fetchTripThunk({ tripId }));
+        })
+  }, [])
+  const showTripInfo = riderProfile?.user?.toLowerCase() === tripInfo?.rider?.toLowerCase()
+console.log(showTripInfo)
+  console.log("riderProfile.user: " + riderProfile.user)
+  console.log("tripInfo.rider: ", tripInfo.rider)
   return (
     <div className="bg-gray-700 min-h-screen text-white">
       <div className="p-6 mx-auto space-y-6 max-w-5xl">
@@ -60,32 +75,28 @@ const RiderDashboard = ({ riderData, assignedTrips, onWithdraw }) => {
         {/* Assigned Trips Section */}
         <div className="bg-white p-4 rounded-xl shadow text-black">
           <h2 className="text-xl font-semibold mb-2">📦 Assigned Trips</h2>
-          {assignedTrips?.length === 0 ? (
+          {!showTripInfo? (
             <p className="text-gray-500">No trips assigned yet.</p>
           ) : (
-            assignedTrips?.map((trip, i) => (
-              <div
-                key={i}
-                className="border-b py-2 flex justify-between items-center"
-              >
+              <div className="border-b py-2 flex justify-between items-center">
                 <div>
-                  <p>Trip #{trip.tripId}</p>
-                  <p>Client: {trip.client}</p>
-                  <p>Fare: {trip.fare} ETH</p>
+                  <p>Trip #{tripInfo.tripId}</p>
+                  <p>Client: {tripInfo.rider}</p>
+                  <p>Client: {tripInfo.client}</p>
+                  <p>Fare: {tripInfo.fare} ETH</p>
                 </div>
                 <div>
                   <span
                     className={`text-sm px-2 py-1 rounded-full ${
-                      trip.isCompleted
+                      riderProfile.isCompleted
                         ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
+                        : "bg-yellow-200 text-yellow-700"
                     }`}
                   >
-                    {trip.isCompleted ? "Completed" : "In Progress"}
+                    {tripInfo.isCompleted ? "Completed" : "In Progress"}
                   </span>
                 </div>
               </div>
-            ))
           )}
                   </div>
                   </div>

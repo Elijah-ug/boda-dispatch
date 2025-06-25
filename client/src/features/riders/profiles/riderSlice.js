@@ -3,7 +3,7 @@ import { fetchRiderProfileThunk } from "./riderProfileThunk";
 
 const initialState = {
   riderProfile: {
-    riderId: 0,
+    riderId: null,
     user: null,
     earnings: "0",
     stars: 0,
