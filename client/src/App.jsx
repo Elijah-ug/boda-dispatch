@@ -5,6 +5,9 @@ import NavBar from './components/navigation/NavBar'
 import RiderDashboard from './components/RiderDashboard'
 import ClientDashbard from './components/ClientDashbard'
 import RegisterPage from './components/RegisterPage'
+import Deposit from './components/Deposit'
+import Withdraw from './components/Withdraw'
+import StartTrip from './components/StartTrip'
 
 export default function App() {
   return (
@@ -14,7 +17,11 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="register" element={ <RegisterPage/>} />
         <Route path="rider" element={<RiderDashboard />} />
-        <Route path="client" element={<ClientDashbard />} />
+        <Route path="client" element={<ClientDashbard />} >
+          <Route path="deposit" element={<Deposit />} />
+          <Route path="withdraw" element={<Withdraw />} />
+          <Route path="trip" element={<StartTrip/>}/>
+        </Route>
 
       </Routes>
     </div>

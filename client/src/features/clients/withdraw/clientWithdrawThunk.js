@@ -6,7 +6,7 @@ export const fetchClinetWithdrawThunk = createAsyncThunk(
     async ({amount}, { rejectWithValue }) => {
         try {
             const contract = await getContract();
-            const withdraw = contract.clientWithdraw(amount);
+            const withdraw = await contract.clientWithdraw(amount);
             await withdraw.wait()
             toast.success("Trip Completed successifully!");
             return start;

@@ -14,10 +14,10 @@ const getSigner = async () => {
     return await provider.getSigner()
 }
 const getContract = async () => {
-    if(!CCIPSenderAddress) throw new Error("Contract Address Unavailable")
+    if(!contractAddress) throw new Error("Contract Address Unavailable")
     const signer = await getSigner();
     const contract = new ethers.Contract(contractAddress, contractAbi.abi, signer);
-    // console.log("contract address", contract.target)
+    console.log("contract address", contract.target)
 
     return contract;
 }

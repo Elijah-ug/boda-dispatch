@@ -10,3 +10,6 @@
 button{
     cursor: pointer;
 }
+.active{
+    color: #fae206;
+}

@@ -6,8 +6,8 @@ export const fetchCompleteTripThunk = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const contract = await getContract();
-            const start = contract.completeTrip();
-            // await start.wait()
+            const start = await contract.completeTrip();
+            await start.wait()
             toast.success("Trip Completed successifully!");
             return start;
 

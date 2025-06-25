@@ -2,21 +2,30 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { autoConnectWallet, connectWallet } from '../features/wallet/connectWallet'
 import { fetchRegisterClientThunk } from '../features/clients/auth/registerThunk';
-// import { fetchRegisterClientThunk } from '../features/clients/deposit/depositThunk';
 import Wallet from './Wallet';
 import { fetchRegisterRiderThunk } from '../features/riders/auth/registerRider';
-// import { connectWallet } from '../redux/wallet/walletSlice'
-// import { registerClient, registerRider } from '../redux/boda/bodaThunks'
+import { fetchClientProfileThunk } from '../features/clients/profiles/clientProfileThunk';
 
 const RegisterPage = () => {
   const dispatch = useDispatch();
   const { address } = useSelector((state) => state.auth);
-  const { riderId } = useSelector((state) => state.rider);
-  const { clientId } = useSelector((state) => state.client);
-  console.log(riderId, clientId)
-  useEffect(() => {
-    dispatch(autoConnectWallet());
-  })
+  const {  riderProfile } = useSelector((state) => state.rider);
+  const { clientProfile } = useSelector((state) => state.client);
+  console.log( clientProfile?.isRegistered)
+
+  // First: connect wallet once
+useEffect(() => {
+  dispatch(autoConnectWallet());
+}, []);
+
+// Then: only fetch profile *after* address is loaded
+useEffect(() => {
+  if (address) {
+    dispatch(fetchClientProfileThunk({ address }));
+  }
+}, [address]);
+console.log("isRegistered: ", clientProfile?.isRegistered)
+
 
   return (
     <div className="bg-gray-700">
@@ -64,9 +73,13 @@ const RegisterPage = () => {
         </div>
 
         </div>
-        <div className="mt-10">
-          <h3 className="font-blod">Registeration Status: {riderId || clientId && ("Registered")}</h3>
-          <h3 className="font-blod">Registered As:{ riderId &&("Rider") || clientId && ("Client")} </h3>
+        <div className="mt-10 bg-amber-300 p-2 rounded-lg">
+          <h3 className="font-blod"><span className="pr-2">Registeration Status:</span>
+            {clientProfile?.isRegistered ? ("Registered") : riderProfile?.isRegistered ? ("Registered") : ("Not Registered")}
+          </h3>
+          <h3 className="font-blod"><span className="pr-2">Registered As:</span>
+            {clientProfile?.isRegistered && ("Client") || riderProfile?.isRegistered && ("Rider")}
+          </h3>
         </div>
       </div>
       </div>

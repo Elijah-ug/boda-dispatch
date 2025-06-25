@@ -6,7 +6,7 @@ export const fetchStartTripThunk = createAsyncThunk(
     async ({rider, fare}, { rejectWithValue }) => {
         try {
             const contract = await getContract();
-            const start = contract.startTrip(rider, fare);
+            const start = await contract.startTrip(rider, fare);
             await start.wait()
             toast.success("Trip Started successifully!");
             return start;

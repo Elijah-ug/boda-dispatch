@@ -2,12 +2,15 @@ import { createSlice } from "@reduxjs/toolkit";
 import { fetchRiderProfileThunk } from "./riderProfileThunk";
 
 const initialState = {
-  isRegistered: false,
-  earnings: "0",
-  stars: 0,
-  totalTrips: 0,
-    riderId: null,
+  riderProfile: {
+    riderId: 0,
     user: null,
+    earnings: "0",
+    stars: 0,
+    totalTrips: 0,
+    isRegistered: false,
+
+  },
   loading: false,
   error: null,
 
@@ -17,16 +20,7 @@ const initialState = {
 const riderSlice = createSlice({
   name: "rider",
   initialState,
-  reducers: {
-    resetRider: (state) => {
-      state.isRegistered = false;
-      state.earnings = "0";
-      state.stars = 0;
-      state.totalTrips = 0;
-      state.riderId = null;
-      state.error = null;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchRiderProfileThunk.pending, (state) => {
@@ -35,12 +29,7 @@ const riderSlice = createSlice({
       })
       .addCase(fetchRiderProfileThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.isRegistered = action.payload.isRegistered;
-        state.earnings = action.payload.earnings;
-        state.stars = action.payload.stars;
-        state.totalTrips = action.payload.totalTrips;
-        state.riderId = action.payload.riderId;
-        state.user = action.payload.user;
+        state.riderProfile = action.payload;
       })
       .addCase(fetchRiderProfileThunk.rejected, (state, action) => {
         state.loading = false;
@@ -49,5 +38,4 @@ const riderSlice = createSlice({
   },
 });
 
-export const { resetRider } = riderSlice.actions;
 export default riderSlice.reducer;
