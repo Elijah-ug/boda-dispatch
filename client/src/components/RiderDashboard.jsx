@@ -81,7 +81,7 @@ console.log(showTripInfo)
               <div className="border-b py-2 flex justify-between items-center">
                 <div>
                   <p>Trip #{tripInfo.tripId}</p>
-                  <p>Client: {tripInfo.rider}</p>
+                  <p>Rider: {tripInfo.rider}</p>
                   <p>Client: {tripInfo.client}</p>
                   <p>Fare: {tripInfo.fare} ETH</p>
                 </div>
