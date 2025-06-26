@@ -74,7 +74,7 @@ const RiderDashboard = ({ riderData, assignedTrips, onWithdraw }) => {
         {/* Assigned Trips Section */}
         <div className="bg-white p-4 rounded-xl shadow text-black">
           <h2 className="text-xl font-semibold mb-2">📦 Recent Assigned Trip Details</h2>
-          {!showTripInfo? (
+          {!showTripInfo && !riderProfile?.isRegistered? (
             <p className="text-gray-500">No trips assigned yet.</p>
           ) : (
               <div className="border-b py-2 flex justify-between items-center">
