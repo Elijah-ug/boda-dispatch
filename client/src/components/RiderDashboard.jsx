@@ -26,8 +26,7 @@ const RiderDashboard = ({ riderData, assignedTrips, onWithdraw }) => {
         })
   }, [])
   const showTripInfo = riderProfile?.user?.toLowerCase() === tripInfo?.rider?.toLowerCase()
-console.log(showTripInfo)
-  console.log("riderProfile.user: " + riderProfile.user)
+  console.log("showTripInfo: " + showTripInfo)
   console.log("tripInfo.rider: ", tripInfo.rider)
   return (
     <div className="bg-gray-700 min-h-screen text-white">
@@ -74,7 +73,7 @@ console.log(showTripInfo)
 
         {/* Assigned Trips Section */}
         <div className="bg-white p-4 rounded-xl shadow text-black">
-          <h2 className="text-xl font-semibold mb-2">📦 Assigned Trips</h2>
+          <h2 className="text-xl font-semibold mb-2">📦 Recent Assigned Trip Details</h2>
           {!showTripInfo? (
             <p className="text-gray-500">No trips assigned yet.</p>
           ) : (

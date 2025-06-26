@@ -14,7 +14,6 @@ export const fetchCurrentTripId = createAsyncThunk(
         // dispatch(fetchCompleteTripThunk({ tripId: myTripId.toString() }));
         return myTripId.toString();
         } catch (error) {
-            toast.error("Failed to fetch Id");
             console.log("Trip id Failed: ", error.message)
             return rejectWithValue(error.message);
 

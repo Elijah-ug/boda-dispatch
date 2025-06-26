@@ -19,7 +19,6 @@ export const fetchTripThunk = createAsyncThunk(
             return tripInfo;
         } catch (error) {
             console.error("❌ Error fetching trip info", error.message);
-            toast.error("Failed to fetch trip info");
             return rejectWithValue(error.message);
         }
 

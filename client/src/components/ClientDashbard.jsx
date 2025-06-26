@@ -14,14 +14,12 @@ const ClientDashbard = () => {
   const { clientProfile } = useSelector((state) => state.client);
   const { address } = useSelector((state) => state.auth);
   console.log("clientProfile.isRegistered: ", clientProfile.isRegistered);
-
-
-
-
   useEffect(() => {
     dispatch(autoConnectWallet())
     dispatch(fetchClientProfileThunk({address}))
   }, [address])
+  const isClient = clientProfile?.user?.toLowerCase() === address?.toLowerCase();
+  console.log("Is Client: ", isClient)
   return (
     <div className="p-6  mx-auto min-h-screen space-y-6 bg-gray-700">
 
@@ -64,7 +62,10 @@ const ClientDashbard = () => {
           {/* <StartTrip /> */}
           {/* My Trips List */}
           <div className="my-10 ml-10">
-            <Trips />
+            {isClient ? (<Trips />) :
+              (<p
+                className="text-amber-400">Not A Client. Client Trip Details Will Appear Here
+              </p>)}
             </div>
           </div>
 
