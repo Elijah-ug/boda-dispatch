@@ -41,7 +41,7 @@ const RiderDashboard = ({ riderData, assignedTrips, onWithdraw }) => {
               <span className="ml-2">{riderProfile?.user?.slice(0, 7)}...{riderProfile?.user?.slice(-5)}</span>
             </p>
             <p><strong>Rider ID:</strong>
-              <span className="ml-2">{riderProfile?.riderId? (Number(riderProfile?.riderId) + 1) : null}</span>
+              <span className="ml-2">{riderProfile?.isRegistered? Number(riderProfile?.riderId + 1) : "N/A"}</span>
             </p>
           </div>
           <div>
@@ -89,7 +89,8 @@ const RiderDashboard = ({ riderData, assignedTrips, onWithdraw }) => {
           ) : (
               <div className="border-b py-2 flex justify-between items-center">
                 <div>
-                  <p>Trip #{tripInfo?.tripId? (Number(tripInfo.tripId) + 1) : null}</p>
+                <p>Trip #{tripInfo?.tripId ? Number(tripInfo.tripId) + 1 : "N/A"}</p>
+
                   <p>Rider: {tripInfo.rider}</p>
                   <p>Client: {tripInfo.client}</p>
                   <p>Fare: {tripInfo.fare} ETH</p>
