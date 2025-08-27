@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 
-contract DecentralizedBodaDispatch is
+contract BodaBlocks is
     AutomationCompatibleInterface,
     Initializable,
     OwnableUpgradeable,
