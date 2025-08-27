@@ -3,15 +3,23 @@ pragma solidity ^0.8.28;
 
 import "@chainlink/contracts/src/v0.8/automation/interfaces/AutomationCompatibleInterface.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 
-contract DecentralizedBodaDispatch is AutomationCompatibleInterface, Initializable, OwnableUpgradeable, ReentrancyGuardUpgradeable {
+contract DecentralizedBodaDispatch is
+    AutomationCompatibleInterface,
+    Initializable,
+    OwnableUpgradeable,
+    ReentrancyGuardUpgradeable
+{
     IERC20 public stableToken;
+    using SafeERC20 for IERC20;
     // ===> Trip Struct
     struct Trip {
         uint256 fare; // slot 0
+        uint256 charges;
         address rider; // slot 2 (20 bytes)
         address client; // slot 3 (20 bytes)
         uint64 distance; // slot 1 (distance in km)
@@ -19,6 +27,7 @@ contract DecentralizedBodaDispatch is AutomationCompatibleInterface, Initializab
         uint64 endTime; // slot 4 (8 bytes)
         uint64 duration; // slot 4 (8 bytes)
         uint32 tripId; // slot 4 (4 bytes)
+        bool tripStarted; // slot 4 (1 byte)
         bool isCompleted; // slot 4 (1 byte)
         bool isPaidOut; // slot 4 (1 byte)
         // padding fills the rest of slot 4 to make 32 bytes
@@ -30,14 +39,14 @@ contract DecentralizedBodaDispatch is AutomationCompatibleInterface, Initializab
         uint256 earnings;
         address user;
         uint32 riderId;
-        uint32 stars;
+        uint32 completedTrips;
         uint32 totalTrips;
         bool isRegistered;
     }
 
     mapping(address => Rider) public riderProfiles;
     uint256 public nextRiderId;
-    address[] public allRiders;
+    // address[] public allRiders;
 
     // ===> Client Struct
     struct Client {
@@ -64,10 +73,19 @@ contract DecentralizedBodaDispatch is AutomationCompatibleInterface, Initializab
     event RiderWithdraw(address rider, uint256 amount);
     event ClientWithdraw(address client, uint256 amount);
     event ClientDeposited(address client, uint256 amount);
-    event TripRequested(uint256 tripId, address client, uint256 _distance);
+    event TripRequested(uint256 tripId, address client, uint256 _distance, uint256 fare);
+    // queue events
+    event TripQueued(uint256 tripId);
+    // ===> Unpaid completed-trip queue (to avoid scanning all trips)
+    // We store tripIds in an array and maintain a read index; processed entries are set to 0.
+    uint256[] private unpaidTripQueue;
+    uint256 private unpaidQueueIndex;
+    uint256 public platformFee;
+    uint32 public percentageFee;
 
     // initializer
-    function initialize(address _tokenUsed) public initializer{
+    function initialize(address _tokenUsed) public initializer {
+        require(_tokenUsed != address(0));
         __Ownable_init(msg.sender);
         __ReentrancyGuard_init();
         stableToken = IERC20(_tokenUsed);
@@ -82,23 +100,27 @@ contract DecentralizedBodaDispatch is AutomationCompatibleInterface, Initializab
         require(riderProfiles[msg.sender].isRegistered, "Not a rider");
         _;
     }
-
+    // platform fee update
+    function updatePlatformPercentageFee(uint32 _percentage) external onlyOwner{
+        require(_percentage <= 1000 , "Much fee");
+        percentageFee = _percentage;
+    }
     // ===> Rider Registration
     function registerRider() external {
         require(
             !riderProfiles[msg.sender].isRegistered,
             "Already registered as rider"
         );
-uint256 newId = nextRiderId++;
+        uint256 newId = nextRiderId++;
         riderProfiles[msg.sender] = Rider({
             earnings: 0,
             user: msg.sender,
             riderId: uint32(newId),
-            stars: 0,
+            completedTrips: 0,
             totalTrips: 0,
             isRegistered: true
         });
-        allRiders.push(msg.sender);
+        // allRiders.push(msg.sender);
         emit RiderRegistered(msg.sender, newId);
     }
 
@@ -108,7 +130,7 @@ uint256 newId = nextRiderId++;
             !clientProfiles[msg.sender].isRegistered,
             "Already registered as client"
         );
-uint256 newId = nextClientId++;
+        uint256 newId = nextClientId++;
         clientProfiles[msg.sender] = Client({
             balance: 0,
             user: msg.sender,
@@ -121,22 +143,27 @@ uint256 newId = nextClientId++;
     }
 
     // ===> Deposit Funds
-    function clientDeposit(uint256 _amount) external payable onlyClient {
-        require(_amount > 0, "Must send some ETH");
-        stableToken.transferFrom(msg.sender, address(this), _amount);
+    function clientDeposit(uint256 _amount) external onlyClient {
+        require(_amount > 0, "Invalid amount");
+        stableToken.safeTransferFrom(msg.sender, address(this), _amount);
         clientProfiles[msg.sender].balance += _amount;
         clientProfiles[msg.sender].hasSomeBalance = true;
 
-        emit ClientDeposited(msg.sender, msg.value);
+        emit ClientDeposited(msg.sender, _amount);
     }
 
-    // ===> Start Trip (non-payable)
-    function initiateTrip(uint64 _distance) external onlyClient {
-        require(clientProfiles[msg.sender].balance > 0, "Insufficient balance");
-        uint256 tripId = nextTripId ++;
 
+    // ===> initiate Trip (non-payable)
+    function initiateTrip(uint64 _distance, uint256 _fare) external onlyClient {
+        Client storage client = clientProfiles[msg.sender];
+        require(client.balance > 0, "Insufficient balance");
+        require(clientProfiles[msg.sender].balance >= _fare, "Low fare");
+        uint256 tripId = nextTripId++;
+        client.balance -= _fare;
+        uint256 charge = (_fare * percentageFee) / 1000;
         trips[tripId] = Trip({
-            fare: 0,
+            fare: _fare,
+            charges: charge,
             rider: address(0),
             client: msg.sender,
             distance: _distance,
@@ -144,27 +171,35 @@ uint256 newId = nextClientId++;
             endTime: 0,
             duration: 0,
             tripId: uint32(tripId),
+            tripStarted: false,
             isCompleted: false,
             isPaidOut: false
         });
-
-        emit TripRequested(tripId, msg.sender, _distance);
+        emit TripRequested(tripId, msg.sender, _distance, _fare);
     }
 
     // ======> rider's reaction to the trip
-    function acceptTripRequest(
-        uint256 _tripId,
-        uint256 _fare
-    ) external onlyRider {
-       Trip storage newTrip = trips[_tripId];
-       require(newTrip.client != address(0), "Invalid Trip");
-       require(newTrip.rider == address(0), "Trip already accepted");
-       require(!newTrip.isCompleted, "Trip completed");
-       require(_fare > 0, "Invalid fare");
-       newTrip.fare = _fare;
-       newTrip.rider = msg.sender;
+    function acceptTripRequest( uint256 _tripId ) external onlyRider nonReentrant {
+        Trip storage newTrip = trips[_tripId];
+        require(newTrip.client != address(0), "Invalid Trip");
+        require(newTrip.rider == address(0), "Trip already accepted");
+        require(!newTrip.isCompleted, "Trip completed");
+        require(!newTrip.tripStarted, "Trip started");
+        // Client storage client = clientProfiles[newTrip.client];
+        require(newTrip.fare > 0, "No locked fare");
+        newTrip.rider = msg.sender;
     }
+    // trigger start trip
+    function tripStarted(uint32 _tripId) external nonReentrant {
+        Trip storage newTrip = trips[_tripId];
+        require(newTrip.client != address(0), "Invalid Trip");
+        require(newTrip.rider != address(0), "Trip already accepted");
+        require(!newTrip.tripStarted, "Trip Started");
+        require(newTrip.fare > 0, "No locked fare");
+        newTrip.tripStarted = true;
+        emit TripStarted(_tripId, newTrip.client, newTrip.rider, newTrip.fare);
 
+    }
     // ===> Complete Trip
     function completeTrip(uint256 _tripId) external onlyClient {
         Trip storage trip = trips[_tripId];
@@ -174,37 +209,41 @@ uint256 newId = nextClientId++;
         trip.isCompleted = true;
         trip.endTime = uint64(block.timestamp);
         trip.duration = trip.endTime - trip.startTime;
+        trip.tripStarted = false;
+        // enqueue unpaid completed trip for Automation to process
+        if (!trip.isPaidOut) {
+            unpaidTripQueue.push(_tripId);
+            emit TripQueued(_tripId);
+        }
     }
 
     // ===> Reward Rider (can be called manually or by Automation)
-    function rewardTripRiderByFare(uint256 _tripId) public {
+    function rewardTripRiderByFare(uint256 _tripId) public nonReentrant {
         Trip storage trip = trips[_tripId];
         require(trip.isCompleted, "Trip not complete");
         require(!trip.isPaidOut, "Already paid");
         require(trip.client != address(0), "Invalid trip");
-    require(trip.rider != address(0), "No rider");
-
-        Client storage client = clientProfiles[trip.client];
+        require(trip.rider != address(0), "No rider");
         Rider storage rider = riderProfiles[trip.rider];
-
-        require(client.balance >= trip.fare, "Insufficient client balance");
-
-        client.balance -= trip.fare;
-        rider.earnings += trip.fare;
-        rider.stars += 1;
+        uint256 netPayment = trip.fare - trip.charges;
+        rider.earnings += netPayment;
+        platformFee += trip.charges;
+        rider.completedTrips += 1;
         rider.totalTrips += 1;
 
         trip.isPaidOut = true;
 
-        emit TripCompleted(_tripId, trip.rider, rider.stars);
+        emit TripCompleted(_tripId, trip.rider, rider.completedTrips);
     }
 
     // ===> Withdraw Rider Earnings
-    function riderWithdrawEarnings(uint256 _amount) external onlyRider nonReentrant {
+    function riderWithdrawEarnings(
+        uint256 _amount
+    ) external onlyRider nonReentrant {
         Rider storage rider = riderProfiles[msg.sender];
         require(_amount > 0 && rider.earnings >= _amount, "Invalid amount");
         rider.earnings -= _amount;
-        stableToken.transfer(msg.sender, _amount);
+        stableToken.safeTransfer(msg.sender, _amount);
 
         emit RiderWithdraw(msg.sender, _amount);
     }
@@ -213,34 +252,52 @@ uint256 newId = nextClientId++;
     function clientWithdraw(uint256 _amount) external onlyClient nonReentrant {
         Client storage client = clientProfiles[msg.sender];
         require(_amount > 0 && client.balance >= _amount, "Invalid amount");
-
-        client.balance -= _amount;
-        stableToken.transfer(msg.sender, _amount);
+        uint256 fee = (_amount * percentageFee) / 1000;
+       client.balance -= _amount;
+        platformFee += fee;
+        uint256 netWithdraw = _amount -= fee;
+        stableToken.safeTransfer(msg.sender, netWithdraw);
 
         emit ClientWithdraw(msg.sender, _amount);
     }
 
+    function withdrawFees(uint256 _amount) external onlyOwner nonReentrant{
+        require(platformFee >= _amount, "Invalid amount");
+        stableToken.safeTransfer(msg.sender, _amount);
+    }
     // ===> Chainlink Automation
 
-    function checkUpkeep(
-        bytes calldata
-    )
-        external
-        view
-        override
-        returns (bool upkeepNeeded, bytes memory performData)
-    {
-        for (uint256 i = 0; i < nextTripId; i++) {
-            Trip memory trip = trips[i];
-            if (trip.isCompleted && !trip.isPaidOut) {
-                return (true, abi.encode(i));
+    function checkUpkeep( bytes calldata) external view override returns (bool upkeepNeeded, bytes memory performData){
+        for (uint256 i = unpaidQueueIndex; i < unpaidTripQueue.length; i++) {
+            uint256 id = unpaidTripQueue[i];
+            if (id == 0) {
+                continue;
             }
+
+            Trip memory trip = trips[id];
+
+            if (trip.isCompleted && !trip.isPaidOut) {
+                    return (true, abi.encode(id));
+                }
         }
         return (false, "");
     }
-
+    // performUpkeep will clear the queue entry (set to 0) and advance unpaidQueueIndex when possible,
+    // then call rewardTripRiderByFare to process payment.
     function performUpkeep(bytes calldata performData) external override {
         uint256 tripId = abi.decode(performData, (uint256));
+        // find and clear the queued entry (we don't shift the array; we set slot to 0)
+        for (uint256 i = unpaidQueueIndex; i < unpaidTripQueue.length; i++) {
+            if (unpaidTripQueue[i] == tripId) {
+                unpaidTripQueue[i] = 0;
+                // advance unpaidQueueIndex while front slots are zero
+                while (   unpaidQueueIndex < unpaidTripQueue.length &&  unpaidTripQueue[unpaidQueueIndex] == 0 ) {
+                    unpaidQueueIndex++;
+                }
+            }
+        }
+        // perform the actual reward (To revert if client balance is insufficient)
+
         rewardTripRiderByFare(tripId);
     }
 
@@ -260,11 +317,14 @@ uint256 newId = nextClientId++;
     ) external view returns (Trip memory) {
         return trips[_tripId];
     }
+    function getStableToken() external view returns (address) {
+        return address(stableToken);
+    }
 
-    function getAllRiders() external view returns (address[] memory) {
-        return allRiders;
+    function returnPlatformFees() external view onlyOwner returns (uint256) {
+        return platformFee;
     }
 
     // ===> Accept fallback ETH
-    receive() external payable {}
+    // receive() external payable {}
 }
