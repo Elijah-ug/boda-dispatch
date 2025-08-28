@@ -1,6 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getContract } from "../../../contract/contract";
-import { toast } from "react-toastify";
 import { formatEther } from "ethers";
 
 export const fetchRiderProfileThunk = createAsyncThunk(

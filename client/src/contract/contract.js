@@ -1,5 +1,5 @@
 import { contractAddress } from "../config";
-import contractAbi from "../utils/DecentralizedBodaDispatch.json";
+import contractAbi from '../utils/BodaBlocks.json';
 import { ethers } from "ethers"
 const getProvider = () => {
     if (window.ethereum) {
