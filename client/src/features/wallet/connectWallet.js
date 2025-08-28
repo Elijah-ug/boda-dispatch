@@ -16,10 +16,10 @@ export const connectWallet = createAsyncThunk(
                 })
             }
             const accounts = await window.ethereum.request({ method: "eth_requestAccounts" })
-            toast.success("Wallet connected")
             return {address: accounts[0] }
         } catch (error) {
-            rejectWithValue(error.message);
+            console.log(error.message);
+          return  rejectWithValue(error.message);
         }
     }
 )

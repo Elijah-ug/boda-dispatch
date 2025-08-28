@@ -16,7 +16,7 @@ export const fetchClientProfileThunk = createAsyncThunk(
             const balance = formatEther(clientInfo[2].toString());
             const isRegistered = clientInfo[3];
             const hasSomeBalance = clientInfo[4];
-            console.log(isRegistered)
+            console.log('balance ' + balance);
       return { clientId, user, balance, isRegistered, hasSomeBalance, }
  } catch (error) {
             console.error("❌ Error fetching client info", error.message);
