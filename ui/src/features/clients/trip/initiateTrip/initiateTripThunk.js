@@ -9,9 +9,10 @@ export const fetchInitiateTripThunk = createAsyncThunk(
       const start = await contract.initiateTrip(distance, fare);
       await start.wait();
       toast.success('Trip Started successifully!');
-      console.log(start);
-        return true;
+      //   console.log(start);
+      return true;
     } catch (error) {
+        console.log(error.message);
       toast.error('Trip start Failed');
       return rejectWithValue(error.message);
     }

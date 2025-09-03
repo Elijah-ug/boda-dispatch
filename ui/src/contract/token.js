@@ -8,22 +8,11 @@ const AFB_ABI = [
   'function decimals() view returns (uint8)',
 ];
 
-const getProvider = () => {
-    if (window.ethereum) {
-        return new ethers.BrowserProvider(window.ethereum);
-    } else {
-        throw new Error("Metamask Not installed")
-    }
-}
-const getSigner = async () => {
-    const provider = getProvider();
-    await provider.send("eth_requestAccounts", []);
-    return await provider.getSigner()
-}
 export const getTokenContract = async () => {
-    const signer = await getSigner();
-    const contract = new ethers.Contract(tokenAddr, AFB_ABI.abi, signer);
-    console.log("contract");
-    return contract
-
+  if (!window.ethereum) {
+    throw new Error('Metamask Not installed');
+  }
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  const signer = await provider.getSigner();
+  return new ethers.Contract(tokenAddr, AFB_ABI, signer);
 };

@@ -5,12 +5,13 @@ export default function NavBar() {
       <div className="logo">
         <h3>BodaBlocks</h3>
       </div>
-      <div className="flex gap-6">
+      <div className="flex gap-6 text-sm">
         <NavLink to="/">Home</NavLink>
         <NavLink to="register">Register</NavLink>
         <NavLink to="rider">Rider Dashboard</NavLink>
         <NavLink to="client">Client Dashboard</NavLink>
         <NavLink to="admin">Admin Dashboard</NavLink>
+        <NavLink to="available-clients">Available Customers</NavLink>
       </div>
     </div>
   );
