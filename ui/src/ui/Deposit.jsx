@@ -10,17 +10,17 @@ export default function Deposit() {
     const { clientProfile } = useSelector((state) => state.client);
     const { address } = useSelector((state) => state.auth);
     const handleDeposit = () => {
-
-        if (parseFloat(depositAmount) < 0 || isNaN(depositAmount)) {
-          alert("Invalid Amount");
-          return;
-        }
-      dispatch(fetchClientDepositThunk({ amount: parseEther(depositAmount.toString()) }));
-      dispatch(fetchClientProfileThunk({address}))
-      console.log("depositAmount: ", depositAmount)
-      console.log("Type of depositAmount: ", typeof (depositAmount))
-      setDepositAmount("");
+      const parsedAmount = parseFloat(depositAmount);
+      if (parsedAmount < 0 || isNaN(parsedAmount)) {
+        alert('Invalid Amount');
+        return;
       }
+      dispatch(fetchClientDepositThunk({ amount: parseEther(parsedAmount.toString()) }));
+      dispatch(fetchClientProfileThunk({ address }));
+      //   console.log('depositAmount: ', parsedAmount);
+      //   console.log('Type of depositAmount: ', typeof parsedAmount);
+      setDepositAmount('');
+    }
   return (
       <div>
           <div className="bg-white p-4 rounded-xl shadow">

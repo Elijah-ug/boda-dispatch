@@ -3,11 +3,11 @@ import { fetchClientProfileThunk } from "./clientProfileThunk";
 
 const initialState = {
   clientProfile: {
-  isRegistered: false,
-  balance: "0",
-  clientId: null,
-  user: null,
-  hasSomeBalance: false,
+    balance: "0",
+    user: null,
+    clientId: null,
+    isRegistered: false,
+    hasSomeBalance: false,
   },
 
   loading: false,

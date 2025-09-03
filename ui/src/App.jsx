@@ -14,6 +14,7 @@ import { autoConnectWallet } from './features/wallet/connectWallet';
 import Footer from './ui/Footer';
 import AdminDashboard from './ui/admin/AdminDashboard';
 import InitiateTrip from './ui/InitiateTrip';
+import { AvailableClients } from './ui/AvailableClients';
 
 export default function App() {
   const dispatch = useDispatch();
@@ -57,6 +58,7 @@ export default function App() {
             <Route path="trip" element={<InitiateTrip />} />
           </Route>
           <Route path="admin" element={<AdminDashboard />} />
+          <Route path="available-clients" element={<AvailableClients />} />
         </Routes>
       </div>
 

@@ -22,8 +22,6 @@ export default function InitiateTrip() {
     userDecisionTimeout: 3000,
   });
 
-  //   console.log('coords ==> ', coords);
-
   const getDestinationIp = async () => {
     try {
       if (city) {
@@ -91,20 +89,28 @@ export default function InitiateTrip() {
   }, [pickup, destinationIp]);
   const handleSubmitDestination = () => {
     getDestinationIp();
-    if (!city || !route) {
+    if (!city) {
       alert('Missing fields');
       return;
     }
-    //   console.log('city: ', city);
-    const calculatedFare =
-      Math.floor(
-        parseFloat(import.meta.env.VITE_BASEFARE) + parseFloat(route) * parseFloat(import.meta.env.VITE_PERKMRATE) * 100
-      ) / 100;
-    dispatch(fetchInitiateTripThunk({ distance: route.toString(), fare: parseEther(calculatedFare.toString()) }));
-    console.log('calculatedFare: ==>', typeof calculatedFare, calculatedFare);
     console.log('Distance in KM is: ==>', route);
-    console.log('duration==>', duration);
+    //   console.log('city: ', city);
+    const parsedBaseFare = parseFloat(import.meta.env.VITE_BASEFARE);
+    const parsedPerKmRate = parseFloat(import.meta.env.VITE_PERKMRATE);
+    const calculatedFare = Math.floor((parsedBaseFare + parseFloat(route) * parsedPerKmRate) * 100) / 100;
+    // const distanceMeters = Math.round(parseFloat(route) * 1000);
     console.log('duration==>', duration, 'city==>', city, 'calculatedFare=>', calculatedFare);
+    if (!route) {
+      alert('Missing Distance');
+      return;
+    }
+    dispatch(
+      fetchInitiateTripThunk({
+        distance: Math.round(parseFloat(route) * 1000),
+        fare: parseEther(calculatedFare.toString()),
+      })
+    );
+    // console.log('distanceMeters: ==>', typeof route, route);
     setCity('');
   };
 
