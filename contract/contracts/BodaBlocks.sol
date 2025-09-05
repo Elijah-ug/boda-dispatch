@@ -167,7 +167,7 @@ contract BodaBlocks is
             rider: address(0),
             client: msg.sender,
             distance: _distance,
-            startTime: uint64(block.timestamp),
+            startTime: 0,
             endTime: 0,
             duration: 0,
             tripId: uint32(tripId),
@@ -190,13 +190,15 @@ contract BodaBlocks is
         newTrip.rider = msg.sender;
     }
     // trigger start trip
-    function tripStarted(uint32 _tripId) external nonReentrant {
+    function tripStarted(uint32 _tripId) external onlyClient  nonReentrant {
         Trip storage newTrip = trips[_tripId];
         require(newTrip.client != address(0), "Invalid Trip");
+        require(msg.sender == newTrip.client, "Not recognized");
         require(newTrip.rider != address(0), "Trip already accepted");
         require(!newTrip.tripStarted, "Trip Started");
         require(newTrip.fare > 0, "No locked fare");
         newTrip.tripStarted = true;
+        newTrip.startTime = uint64(block.timestamp);
         emit TripStarted(_tripId, newTrip.client, newTrip.rider, newTrip.fare);
 
     }
@@ -205,6 +207,7 @@ contract BodaBlocks is
         Trip storage trip = trips[_tripId];
         require(msg.sender == trip.client, "Only client can complete trip");
         require(!trip.isCompleted, "Trip already completed");
+        require(trip.tripStarted, "Trip wasn't started");
 
         trip.isCompleted = true;
         trip.endTime = uint64(block.timestamp);
