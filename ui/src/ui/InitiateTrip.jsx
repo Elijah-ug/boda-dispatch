@@ -12,7 +12,7 @@ export default function InitiateTrip() {
   const [route, setRoute] = useState('');
   const [pickup, setPickup] = useState(null);
   const [duration, setDuration] = useState(null);
-  const [city, setCity] = useState('');
+  const [destination, setDestination] = useState('');
   const [destinationIp, setDestinationIp] = useState({ latitude: '', longitude: '' });
   const dispatch = useDispatch();
   const { coords } = useGeolocated({
@@ -24,9 +24,9 @@ export default function InitiateTrip() {
 
   const getDestinationIp = async () => {
     try {
-      if (city) {
+      if (destination) {
         const currentLocation = await fetch(
-          `https://geocode.maps.co/search?city=${city}&api_key=68b3438e46e12347100603fqe72acb7`
+          `https://geocode.maps.co/search?city=${destination}&api_key=68b3438e46e12347100603fqe72acb7`
         );
         const data = await currentLocation.json();
         const relevantLocation = data.find(loc => loc.lat && loc.lon);
@@ -35,7 +35,7 @@ export default function InitiateTrip() {
         setDestinationIp({ latitude: relevantLocation?.lat, longitude: relevantLocation?.lon });
         // console.log('city: ', city);
       } else {
-        console.log('No city found');
+        console.log('No destination found');
       }
     } catch (error) {
       console.log(error.message);
@@ -89,17 +89,17 @@ export default function InitiateTrip() {
   }, [pickup, destinationIp]);
   const handleSubmitDestination = () => {
     getDestinationIp();
-    if (!city) {
+    if (!destination) {
       alert('Missing fields');
       return;
     }
     console.log('Distance in KM is: ==>', route);
-    //   console.log('city: ', city);
+    //   console.log('destination: ', destination);
     const parsedBaseFare = parseFloat(import.meta.env.VITE_BASEFARE);
     const parsedPerKmRate = parseFloat(import.meta.env.VITE_PERKMRATE);
     const calculatedFare = Math.floor((parsedBaseFare + parseFloat(route) * parsedPerKmRate) * 100) / 100;
     // const distanceMeters = Math.round(parseFloat(route) * 1000);
-    console.log('duration==>', duration, 'city==>', city, 'calculatedFare=>', calculatedFare);
+    console.log('duration==>', duration, 'destination==>', destination, 'calculatedFare=>', calculatedFare);
     if (!route) {
       alert('Missing Distance');
       return;
@@ -111,7 +111,7 @@ export default function InitiateTrip() {
       })
     );
     // console.log('distanceMeters: ==>', typeof route, route);
-    setCity('');
+    setDestination('');
   };
 
   return (
@@ -125,14 +125,26 @@ export default function InitiateTrip() {
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Input
-                  id="distance"
+                  id="pickup"
                   type="text"
-                  value={city}
-                  onChange={e => setCity(e.target.value)}
+                  value={pickup}
+                  onChange={e => setPickup(e.target.value)}
                   placeholder="Kisaasi"
                   required
                 />
               </div>
+
+              <div className="grid gap-2">
+                <Input
+                  id="distance"
+                  type="text"
+                  value={destination}
+                  onChange={e => setDestination(e.target.value)}
+                  placeholder="Kisaasi"
+                  required
+                />
+              </div>
+
               <div className="grid gap-2">
                 <Button type="button" onClick={handleSubmitDestination} className="w-full">
                   Initiate Trip

@@ -12,4 +12,9 @@ Currently, two official plugins are available:
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
 
 fare = baseFare + (distanceInKm * perKmRate) + surgeFee + riderTierBonus
-
+## 8th - 13th program
+8th bakend work to store tx, riders and trips 
+9th connecting backend to frontend
+10th cleaning UI flow + clean and consistency in state management + mobile view
+11th re-deploying the contract and simulating everything to test dApp functionality
+12th posting on Linkedin the completed phase 2/3 dApp status
