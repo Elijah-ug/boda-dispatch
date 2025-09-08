@@ -23,13 +23,12 @@ contract BodaBlocks is
         address rider; // slot 2 (20 bytes)
         address client; // slot 3 (20 bytes)
         uint64 distance; // slot 1 (distance in km)
-        uint64 startTime; // slot 4 (8 bytes)
-        uint64 endTime; // slot 4 (8 bytes)
-        uint64 duration; // slot 4 (8 bytes)
         uint32 tripId; // slot 4 (4 bytes)
         bool tripStarted; // slot 4 (1 byte)
         bool isCompleted; // slot 4 (1 byte)
         bool isPaidOut; // slot 4 (1 byte)
+        string pickup; // slot 6 (pointer)
+        string destination; // slot 7 (pointer)
         // padding fills the rest of slot 4 to make 32 bytes
     }
     mapping(uint256 => Trip) public trips;
@@ -73,7 +72,12 @@ contract BodaBlocks is
     event RiderWithdraw(address rider, uint256 amount);
     event ClientWithdraw(address client, uint256 amount);
     event ClientDeposited(address client, uint256 amount);
-    event TripRequested(uint256 tripId, address client, uint256 _distance, uint256 fare);
+    event TripRequested(
+        uint256 tripId,
+        address client,
+        uint256 _distance,
+        uint256 fare
+    );
     // queue events
     event TripQueued(uint256 tripId);
     // ===> Unpaid completed-trip queue (to avoid scanning all trips)
@@ -101,8 +105,10 @@ contract BodaBlocks is
         _;
     }
     // platform fee update
-    function updatePlatformPercentageFee(uint32 _percentage) external onlyOwner{
-        require(_percentage <= 1000 , "Much fee");
+    function updatePlatformPercentageFee(
+        uint32 _percentage
+    ) external onlyOwner {
+        require(_percentage <= 1000, "Much fee");
         percentageFee = _percentage;
     }
     // ===> Rider Registration
@@ -152,9 +158,13 @@ contract BodaBlocks is
         emit ClientDeposited(msg.sender, _amount);
     }
 
-
     // ===> initiate Trip (non-payable)
-    function initiateTrip(uint64 _distance, uint256 _fare) external onlyClient {
+    function initiateTrip(
+        string memory _pickup,
+        string memory _destination,
+        uint64 _distance,
+        uint256 _fare
+    ) external onlyClient {
         Client storage client = clientProfiles[msg.sender];
         require(client.balance > 0, "Insufficient balance");
         require(clientProfiles[msg.sender].balance >= _fare, "Low fare");
@@ -167,19 +177,20 @@ contract BodaBlocks is
             rider: address(0),
             client: msg.sender,
             distance: _distance,
-            startTime: 0,
-            endTime: 0,
-            duration: 0,
             tripId: uint32(tripId),
             tripStarted: false,
             isCompleted: false,
-            isPaidOut: false
+            isPaidOut: false,
+            pickup: _pickup,
+            destination: _destination
         });
         emit TripRequested(tripId, msg.sender, _distance, _fare);
     }
 
     // ======> rider's reaction to the trip
-    function acceptTripRequest( uint256 _tripId ) external onlyRider nonReentrant {
+    function acceptTripRequest(
+        uint256 _tripId
+    ) external onlyRider nonReentrant {
         Trip storage newTrip = trips[_tripId];
         require(newTrip.client != address(0), "Invalid Trip");
         require(newTrip.rider == address(0), "Trip already accepted");
@@ -190,7 +201,7 @@ contract BodaBlocks is
         newTrip.rider = msg.sender;
     }
     // trigger start trip
-    function tripStarted(uint32 _tripId) external onlyClient  nonReentrant {
+    function tripStarted(uint32 _tripId) external onlyClient nonReentrant {
         Trip storage newTrip = trips[_tripId];
         require(newTrip.client != address(0), "Invalid Trip");
         require(msg.sender == newTrip.client, "Not recognized");
@@ -198,9 +209,7 @@ contract BodaBlocks is
         require(!newTrip.tripStarted, "Trip Started");
         require(newTrip.fare > 0, "No locked fare");
         newTrip.tripStarted = true;
-        newTrip.startTime = uint64(block.timestamp);
         emit TripStarted(_tripId, newTrip.client, newTrip.rider, newTrip.fare);
-
     }
     // ===> Complete Trip
     function completeTrip(uint256 _tripId) external onlyClient {
@@ -210,8 +219,6 @@ contract BodaBlocks is
         require(trip.tripStarted, "Trip wasn't started");
 
         trip.isCompleted = true;
-        trip.endTime = uint64(block.timestamp);
-        trip.duration = trip.endTime - trip.startTime;
         trip.tripStarted = false;
         // enqueue unpaid completed trip for Automation to process
         if (!trip.isPaidOut) {
@@ -256,7 +263,7 @@ contract BodaBlocks is
         Client storage client = clientProfiles[msg.sender];
         require(_amount > 0 && client.balance >= _amount, "Invalid amount");
         uint256 fee = (_amount * percentageFee) / 1000;
-       client.balance -= _amount;
+        client.balance -= _amount;
         platformFee += fee;
         uint256 netWithdraw = _amount -= fee;
         stableToken.safeTransfer(msg.sender, netWithdraw);
@@ -264,13 +271,20 @@ contract BodaBlocks is
         emit ClientWithdraw(msg.sender, _amount);
     }
 
-    function withdrawFees(uint256 _amount) external onlyOwner nonReentrant{
+    function withdrawFees(uint256 _amount) external onlyOwner nonReentrant {
         require(platformFee >= _amount, "Invalid amount");
         stableToken.safeTransfer(msg.sender, _amount);
     }
     // ===> Chainlink Automation
 
-    function checkUpkeep( bytes calldata) external view override returns (bool upkeepNeeded, bytes memory performData){
+    function checkUpkeep(
+        bytes calldata
+    )
+        external
+        view
+        override
+        returns (bool upkeepNeeded, bytes memory performData)
+    {
         for (uint256 i = unpaidQueueIndex; i < unpaidTripQueue.length; i++) {
             uint256 id = unpaidTripQueue[i];
             if (id == 0) {
@@ -280,8 +294,8 @@ contract BodaBlocks is
             Trip memory trip = trips[id];
 
             if (trip.isCompleted && !trip.isPaidOut) {
-                    return (true, abi.encode(id));
-                }
+                return (true, abi.encode(id));
+            }
         }
         return (false, "");
     }
@@ -294,7 +308,10 @@ contract BodaBlocks is
             if (unpaidTripQueue[i] == tripId) {
                 unpaidTripQueue[i] = 0;
                 // advance unpaidQueueIndex while front slots are zero
-                while (   unpaidQueueIndex < unpaidTripQueue.length &&  unpaidTripQueue[unpaidQueueIndex] == 0 ) {
+                while (
+                    unpaidQueueIndex < unpaidTripQueue.length &&
+                    unpaidTripQueue[unpaidQueueIndex] == 0
+                ) {
                     unpaidQueueIndex++;
                 }
             }

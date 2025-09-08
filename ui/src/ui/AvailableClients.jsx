@@ -5,6 +5,7 @@ import { FiCopy } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";   
 
 export const AvailableClients = () => {
   const [copied, setCopied] = useState(false);
@@ -31,31 +32,49 @@ export const AvailableClients = () => {
     setTimeout(() => setCopied(false), 1500);
   };
   return (
-    <div>
-      {tripInfo.client ? (
-        <div>
-          <div className="flex">
-            <div className="flex items-center gap-1">
-              <span className="text-sm ">
-                {tripInfo?.client?.slice(0, 7)}...{tripInfo?.client?.slice(-5)}
-              </span>
-              <Button onClick={() => handleCopyAddress(tripInfo?.client)} className="bg-gray-600 hover:bg-gray-600">
-                {clientAddress === tripInfo?.client && copied ? (
-                  <FaCheck className="text-green-400 text-sm font-extralight" />
-                ) : (
-                  <FiCopy />
-                )}
-              </Button>
-            </div>
-          </div>
-          <div className="flex">
-            <span>Distance:</span>
-            <span>{tripInfo?.distance ? tripInfo.distance / 1000 + "Km" : "N/A"}</span>
-          </div>
-        </div>
-      ) : (
-        <p>No trip fetched</p>
-      )}
+    <div className="p-3 sm:px-10">
+      <div className="grid grid-cols-2 sm:grid-cols-3">
+        {tripInfo.client ? (
+          <Card className="w-xs max-w-lg bg-gray-600 border-none text-gray-200">
+            {/* <CardHeader>
+            <CardTitle className="text-gray-300">Destination</CardTitle>
+          </CardHeader> */}
+            <CardContent>
+              <div className="flex">
+                <div className="flex items-center gap-2 cursor-pointer">
+                  <span className="">
+                    {tripInfo?.client?.slice(0, 7)}...{tripInfo?.client?.slice(-5)}
+                  </span>
+                  <div onClick={() => handleCopyAddress(tripInfo?.client)} className="">
+                    {clientAddress === tripInfo?.client && copied ? (
+                      <div className="flex items-center text-sm gap-1">
+                        <FaCheck className="text-green-400" />
+                        <span>copied</span>
+                      </div>
+                    ) : (
+                      <FiCopy />
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="flex">
+                <span>Destination:</span>
+                <span></span>
+              </div>
+
+              <div className="flex">
+                <span>Distance:</span>
+                <span>{tripInfo?.distance ? tripInfo.distance / 1000 + "Km" : "N/A"}</span>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button>Accept Trip</Button>
+            </CardFooter>
+          </Card>
+        ) : (
+          <p>No trip fetched</p>
+        )}
+      </div>
     </div>
   );
 };

@@ -2,6 +2,13 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+
+body{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #121212;
+}
 .img{
     background-image: url("https://bajajverma.com/wp-content/uploads/2023/02/CT125-1_pages-to-jpg-0001-removebg-preview.png");
     background-size: cover; /* or contain */
@@ -11,6 +18,7 @@
     margin: 0;
     color: #f5f2f2;
 }
+
 button{
     cursor: pointer;
 }
