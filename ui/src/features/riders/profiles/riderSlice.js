@@ -9,7 +9,6 @@ const initialState = {
     stars: 0,
     totalTrips: 0,
     isRegistered: false,
-
   },
   loading: false,
   error: null,
