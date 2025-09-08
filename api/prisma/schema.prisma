@@ -39,9 +39,10 @@ model client {
 model trip {
   id             Int      @id @default(autoincrement())
   createdAt      DateTime @default(now())
-  balance        Int
-  user           String
-  clientId       String
+  fare        Int
+  charges           Int
+  rider       String
+  client String
   isRegistered   Boolean
   hasSomeBalance Boolean
 }
