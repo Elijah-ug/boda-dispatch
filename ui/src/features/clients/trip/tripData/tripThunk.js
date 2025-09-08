@@ -17,13 +17,12 @@ export const fetchTripThunk = createAsyncThunk("trips/fetchTripThunk", async (_,
       rider: trip.rider,
       client: trip.client,
       distance: trip.distance.toString(),
-      startTime: trip.startTime.toString(),
-      endTime: trip.endTime.toString(),
-      duration: trip.duration.toString(),
       tripId: trip.tripId.toString(),
       tripStarted: trip.tripStarted,
       isCompleted: trip.isCompleted,
       isPaidOut: trip.isPaidOut,
+      pickup: trip.pickup,
+      destination: trip.destination,
     };
     return tripInfo;
   } catch (error) {
