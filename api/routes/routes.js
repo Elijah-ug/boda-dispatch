@@ -1,24 +1,22 @@
 import express from "express";
-import { getUserRemoteAddress } from "../controllers/locationControllers.js";
-import { getUserDestnation } from "../controllers/locationControllers.js";
+import { addTrip, deleteTrip, getTrip } from "../controllers/tripsControllers.js";
+import { addTxHistory, deleteTxHistory, getTxHistory } from "../controllers/txControllers.js";
+import { addRider, deleteRider, getRiders } from "../controllers/ridersController.js";
 
 const router = express.Router();
-
-router.get('/', getUserRemoteAddress);
-router.post("/", getUserDestnation)
-// trips
+//trips
 router.post("/", addTrip);
-router.get('/', getTrip);
-router.delete('/:id', deleteTrip);
+router.get("/", getTrip);
+router.delete("/:id", deleteTrip);
 
 // transactions
 router.post("/", addTxHistory);
-router.get('/', getTxHistory);
-router.delete('/:id', deleteTxHistory);
+router.get("/", getTxHistory);
+router.delete("/:id", deleteTxHistory);
 
 // Boda riders
-router.post('/', addRider);
-router.get('/', getRiders);
-router.delete('/:id', deleteRider);
+router.post("/riders", addRider);
+router.get("/riders", getRiders);
+router.delete("/riders:id", deleteRider);
 
 export default router;

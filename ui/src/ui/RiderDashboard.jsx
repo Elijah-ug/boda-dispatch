@@ -4,6 +4,7 @@ import { fetchRiderProfileThunk } from "../features/riders/profiles/riderProfile
 import { autoConnectWallet } from "../features/wallet/connectWallet";
 import { fetchTripThunk } from "../features/clients/trip/tripData/tripThunk";
 import { fetchCurrentTripId } from "../features/clients/trip/tripData/currentTripIdThunk";
+import { CreateRider } from "./routes/CreateRider";
 
 const RiderDashboard = ({ riderData, assignedTrips, onWithdraw }) => {
   const [withdrawAmount, setWithdrawAmount] = useState("");
@@ -28,6 +29,7 @@ const RiderDashboard = ({ riderData, assignedTrips, onWithdraw }) => {
   const showTripInfo = riderProfile?.user?.toLowerCase() === tripInfo?.rider?.toLowerCase()
   console.log("Number(tripInfo.tripId) : " + typeof(Number(tripInfo.tripId)) )
   console.log("tripInfo.rider: ", tripInfo.rider)
+
   return (
     <div className="bg-gray-700 min-h-screen text-white">
       <div className="p-6 mx-auto space-y-6 max-w-5xl">
@@ -110,6 +112,7 @@ const RiderDashboard = ({ riderData, assignedTrips, onWithdraw }) => {
           )}
                   </div>
                   </div>
+                  <CreateRider/>
     </div>
   );
 };
