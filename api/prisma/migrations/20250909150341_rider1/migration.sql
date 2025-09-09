@@ -2,10 +2,10 @@
 CREATE TABLE "public"."Rider" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "riderId" INTEGER NOT NULL,
-    "user" TEXT NOT NULL,
     "earnings" INTEGER NOT NULL,
-    "stars" INTEGER NOT NULL,
+    "user" TEXT,
+    "riderId" INTEGER NOT NULL,
+    "completedTrips" INTEGER NOT NULL,
     "totalTrips" INTEGER NOT NULL,
     "isRegistered" BOOLEAN NOT NULL,
 
@@ -17,7 +17,7 @@ CREATE TABLE "public"."Client" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "balance" INTEGER NOT NULL,
-    "user" TEXT NOT NULL,
+    "user" TEXT,
     "clientId" INTEGER NOT NULL,
     "isRegistered" BOOLEAN NOT NULL,
     "hasSomeBalance" BOOLEAN NOT NULL,
@@ -43,6 +43,12 @@ CREATE TABLE "public"."trip" (
 
     CONSTRAINT "trip_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Rider_user_key" ON "public"."Rider"("user");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Client_user_key" ON "public"."Client"("user");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "trip_cId_key" ON "public"."trip"("cId");

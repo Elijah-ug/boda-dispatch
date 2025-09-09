@@ -14,23 +14,23 @@ datasource db {
 }
 
 model Rider {
-  id           Int      @id @default(autoincrement())
-  createdAt    DateTime @default(now())
-  riderId      Int
-  user         String   @unique
-  earnings     Int
-  stars        Int
-  totalTrips   Int
-  isRegistered Boolean
-  trip         trip[]
+  id             Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+  earnings       String
+  user           String?  @unique
+  riderId        String
+  completedTrips String
+  totalTrips     String
+  isRegistered   Boolean
+  trip           trip[]
 }
 
 model Client {
   id             Int      @id @default(autoincrement())
   createdAt      DateTime @default(now())
-  balance        Int
-  user           String   @unique
-  clientId       Int
+  balance        String
+  user           String?  @unique
+  clientId       String
   isRegistered   Boolean
   hasSomeBalance Boolean
   trip           trip[]
@@ -39,12 +39,12 @@ model Client {
 model trip {
   id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now())
-  fare        Int
-  charges     Int
+  fare        String
+  charges     String
   rider       Rider    @relation(fields: [rId], references: [id])
   client      Client   @relation(fields: [cId], references: [id])
   distance    String
-  tripId      Int
+  tripId      String
   tripStarted Boolean
   isCompleted Boolean
   IsPainOut   Boolean
@@ -53,4 +53,13 @@ model trip {
   cId         Int      @unique
   rId         Int      @unique
   // relational
+}
+
+model Transaction {
+  id         Int    @id @default(autoincrement())
+  createdAt DateTime
+  txHash     String
+  gasUsed  String
+  to         String
+  from       String
 }

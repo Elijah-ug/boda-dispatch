@@ -541,21 +541,6 @@
               "type": "uint64"
             },
             {
-              "internalType": "uint64",
-              "name": "startTime",
-              "type": "uint64"
-            },
-            {
-              "internalType": "uint64",
-              "name": "endTime",
-              "type": "uint64"
-            },
-            {
-              "internalType": "uint64",
-              "name": "duration",
-              "type": "uint64"
-            },
-            {
               "internalType": "uint32",
               "name": "tripId",
               "type": "uint32"
@@ -574,6 +559,16 @@
               "internalType": "bool",
               "name": "isPaidOut",
               "type": "bool"
+            },
+            {
+              "internalType": "string",
+              "name": "pickup",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "destination",
+              "type": "string"
             }
           ],
           "internalType": "struct BodaBlocks.Trip",
@@ -599,6 +594,16 @@
     },
     {
       "inputs": [
+        {
+          "internalType": "string",
+          "name": "_pickup",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_destination",
+          "type": "string"
+        },
         {
           "internalType": "uint64",
           "name": "_distance",
@@ -885,21 +890,6 @@
           "type": "uint64"
         },
         {
-          "internalType": "uint64",
-          "name": "startTime",
-          "type": "uint64"
-        },
-        {
-          "internalType": "uint64",
-          "name": "endTime",
-          "type": "uint64"
-        },
-        {
-          "internalType": "uint64",
-          "name": "duration",
-          "type": "uint64"
-        },
-        {
           "internalType": "uint32",
           "name": "tripId",
           "type": "uint32"
@@ -918,6 +908,16 @@
           "internalType": "bool",
           "name": "isPaidOut",
           "type": "bool"
+        },
+        {
+          "internalType": "string",
+          "name": "pickup",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "destination",
+          "type": "string"
         }
       ],
       "stateMutability": "view",
