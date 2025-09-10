@@ -1,10 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getContract } from "../../../contract/contract";
 import { formatEther } from "ethers";
+import { fetchRiderEndPoint } from "./registerRiderRoute";
 
 export const fetchRiderProfileThunk = createAsyncThunk(
   "rider/fetchRiderProfileThunk",
-  async ({ address }, { rejectWithValue }) => {
+  async ({ address }, { rejectWithValue, dispatch }) => {
     try {
       const contract = await getContract();
       const riderInfo = await contract.getRiderInfo(address);
@@ -13,12 +14,11 @@ export const fetchRiderProfileThunk = createAsyncThunk(
         user: riderInfo[1],
         riderId: riderInfo[0].toString(),
         completedTrips: riderInfo[4].toString(),
-        
-        stars: riderInfo[3].toString(),
-        
+        totalTrips: riderInfo[3].toString(),
         isRegistered: riderInfo[5],
       };
-      // console.log(isRegistered)
+      await dispatch(fetchRiderEndPoint(riderProfile));
+      console.log(riderProfile);
       return riderProfile;
     } catch (error) {
       console.error("❌ Error fetching client info", error.message);

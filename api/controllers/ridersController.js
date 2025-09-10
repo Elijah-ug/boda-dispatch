@@ -1,13 +1,13 @@
-import { client } from "../prisma/client.js";
+import { prisma } from "../prisma/client.js";
 
 export const addRider = async (req, res) => {
   try {
-    console.log("coming to post");
-    const { riderId, user, earnings, stars, totalTrips, isRegistered } = await req.boday;
-    const rider = await client.rider.upsert({
+    console.log("coming to post " + req.body);
+    const { earnings, user, riderId, completedTrips, totalTrips, isRegistered } = req.body;
+    const rider = await prisma.rider.upsert({
       where: { user },
-      update: { earnings, stars, totalTrips },
-      create: { riderId, user, earnings, stars, totalTrips, isRegistered },
+      update: { earnings, completedTrips, totalTrips },
+      create: { earnings, user, riderId, completedTrips, totalTrips, isRegistered },
     });
     console.log(rider);
     return res.status(200).json(rider);

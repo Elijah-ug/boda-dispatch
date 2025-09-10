@@ -5,26 +5,40 @@ import { FiCopy } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";   
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const AvailableClients = () => {
-  const [copied, setCopied] = useState(false);
-  const [clientAddress, setClientAddress] = useState("");
-  const { tripInfo } = useSelector((state) => state.trips);
-  const dispatch = useDispatch();
-  console.log(tripInfo);
-  useEffect(() => {
-    dispatch(fetchCurrentTripId())
-      .unwrap()
-      .then((tripId) => {
-        console.log("Trip Id =>", tripId);
-        dispatch(fetchTripThunk(tripId));
-      })
-      .catch((error) => {
-        toast.error("Falied to load trip: " + error.message);
-      });
-  }, []);
+  const [clients, setClients] = useState([]);
+  // const [copied, setCopied] = useState(false);
+  // const [clientAddress, setClientAddress] = useState("");
+  // const { tripInfo } = useSelector((state) => state.trips);
+  // const dispatch = useDispatch();
+  // console.log(tripInfo);
+  // useEffect(() => {
+  //   dispatch(fetchCurrentTripId())
+  //     .unwrap()
+  //     .then((tripId) => {
+  //       console.log("Trip Id =>", tripId);
+  //       dispatch(fetchTripThunk(tripId));
+  //     })
+  //     .catch((error) => {
+  //       toast.error("Falied to load trip: " + error.message);
+  //     });
+  // }, []);
 
+  const availableClients = async () => {
+    try {
+      const res = await fetch(import.meta.env.VITE_CLIENT_URL);
+      const data = await res.json();
+      setClients(data);
+      console.log(data);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  useEffect(() => {
+    availableClients();
+  }, []);
   const handleCopyAddress = (addr) => {
     setClientAddress(addr);
     navigator.clipboard.writeText(addr);
@@ -34,13 +48,26 @@ export const AvailableClients = () => {
   return (
     <div className="p-3 sm:px-10">
       <div className="grid grid-cols-2 sm:grid-cols-3">
-        {tripInfo.client ? (
+        {clients.length > 0 ? (
           <Card className="w-xs max-w-lg bg-gray-600 border-none text-gray-200">
-            {/* <CardHeader>
-            <CardTitle className="text-gray-300">Destination</CardTitle>
-          </CardHeader> */}
+            <CardHeader>
+              <CardTitle className="text-gray-300">Destination</CardTitle>
+            </CardHeader>
             <CardContent>
-              <div className="flex">
+              {/* {clients.map((client)=>
+              
+              )} */}
+            </CardContent>
+            <CardFooter>
+              <Button>Accept Trip</Button>
+            </CardFooter>
+          </Card>
+        ) : (
+          <h3>No clients available</h3>
+        )}
+      </div>
+      {/* <div key={client.id} className="">
+                <div className="flex">
                 <div className="flex items-center gap-2 cursor-pointer">
                   <span className="">
                     {tripInfo?.client?.slice(0, 7)}...{tripInfo?.client?.slice(-5)}
@@ -57,6 +84,7 @@ export const AvailableClients = () => {
                   </div>
                 </div>
               </div>
+              
               <div className="flex">
                 <span>Destination:</span>
                 <span></span>
@@ -66,15 +94,7 @@ export const AvailableClients = () => {
                 <span>Distance:</span>
                 <span>{tripInfo?.distance ? tripInfo.distance / 1000 + "Km" : "N/A"}</span>
               </div>
-            </CardContent>
-            <CardFooter>
-              <Button>Accept Trip</Button>
-            </CardFooter>
-          </Card>
-        ) : (
-          <p>No trip fetched</p>
-        )}
-      </div>
+              </div> */}
     </div>
   );
 };

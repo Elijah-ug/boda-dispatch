@@ -1,8 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getContract } from "../../../../contract/contract";
 import { formatEther } from "ethers";
+import { registerTripEndPoint } from "@/features/public/tripRoute";
 
-export const fetchTripThunk = createAsyncThunk("trips/fetchTripThunk", async (_, { rejectWithValue }) => {
+export const fetchTripThunk = createAsyncThunk("trips/fetchTripThunk", async (_, { rejectWithValue, dispatch }) => {
   try {
     const contract = await getContract();
     const nextTripId = await contract.nextTripId();
@@ -24,6 +25,8 @@ export const fetchTripThunk = createAsyncThunk("trips/fetchTripThunk", async (_,
       pickup: trip.pickup,
       destination: trip.destination,
     };
+    console.log(tripInfo);
+    await dispatch(registerTripEndPoint(tripInfo));
     return tripInfo;
   } catch (error) {
     console.error("❌ Error fetching trip info", error.message);
