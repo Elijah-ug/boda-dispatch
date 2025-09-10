@@ -2,13 +2,13 @@ import express from "express";
 import { addTrip, deleteTrip, getTrip } from "../controllers/tripsControllers.js";
 import { addTxHistory, deleteTxHistory, getTxHistory } from "../controllers/txControllers.js";
 import { addRider, deleteRider, getRiders } from "../controllers/ridersController.js";
-import { addClient, deleteClient, getClient } from "../controllers/clientController.js";
+import { addClient, deleteClient, getClients } from "../controllers/clientController.js";
 
 const router = express.Router();
 //trips
-router.post("/", addTrip);
-router.get("/", getTrip);
-router.delete("/:id", deleteTrip);
+router.post("/trips", addTrip);
+router.get("/trips", getTrip);
+router.delete("/trips:id", deleteTrip);
 
 // transactions
 router.post("/tx", addTxHistory);
@@ -22,7 +22,7 @@ router.delete("/riders:id", deleteRider);
 
 // clients
 router.post("/clients", addClient);
-router.get("/clients", getClient);
+router.get("/clients", getClients);
 router.delete("/clients:id", deleteClient);
 
 export default router;

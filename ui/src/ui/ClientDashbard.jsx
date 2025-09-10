@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchClientProfileThunk } from "../features/clients/profiles/clientProfileThunk";
 import { autoConnectWallet } from "../features/wallet/connectWallet";
 import Trips from "./Trips";
-import { CreateClient } from "./routes/CreateClient";
 
 const ClientDashbard = () => {
   const dispatch = useDispatch();
@@ -67,7 +66,6 @@ const ClientDashbard = () => {
             )}
           </div>
         </div>
-        <CreateClient />
         {/* </div> */}
       </div>
     </div>

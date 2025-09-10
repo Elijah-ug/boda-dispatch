@@ -10,12 +10,12 @@ export const fetchRiderWithdrawThunk = createAsyncThunk(
       const tx = await contract.riderWithdrawEarnings(amount);
       const withdraw = await tx.wait();
       const txDetails = {
-        txHash: withdraw.hash,
-        gasUsed: withdraw.gasUsed,
-        to: withdraw.to,
-        from: withdraw.from,
+        txHash: String(withdraw.hash),
+        gasUsed: withdraw.gasUsed?.toString(),
+        to: String(withdraw.to),
+        from: String(withdraw.from),
       };
-      dispatch(transactionDetailsRoute({ txDetails }));
+      await dispatch(transactionDetailsRoute({ txDetails }));
       console.log("withdraw" + withdraw);
       toast.success("Trip Completed successifully!");
       return txDetails;

@@ -1,22 +1,21 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-export const transactionDetailsRoute = createAsyncThunk(
-  "tx/transactionDetails",
-  async (txDetails, { rejectWithValue }) => {
-    console.log("posting to backend:", import.meta.env.VITE_TX_URL);
-    console.log("payload:", txDetails);
+export const registerTripEndPoint = createAsyncThunk(
+  "trip/registerTripEndPoint",
+  async (tripInfo, { rejectWithValue }) => {
+    console.log("payload:", tripInfo);
 
     try {
-      const res = await fetch(import.meta.env.VITE_TX_URL, {
+      const res = await fetch(import.meta.env.VITE_TRIPS_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(txDetails),
+        body: JSON.stringify(tripInfo),
       });
       if (!res.ok) {
         throw new Error(`An error occured: ${res}`);
       }
       const data = await res.json();
-      console.log(txDetails);
+      console.log(tripInfo);
       return data;
     } catch (error) {
       console.log(error);

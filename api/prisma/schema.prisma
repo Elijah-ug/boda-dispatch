@@ -17,49 +17,44 @@ model Rider {
   id             Int      @id @default(autoincrement())
   createdAt      DateTime @default(now())
   earnings       String
-  user           String?  @unique
+  user           String   @unique
   riderId        String
   completedTrips String
   totalTrips     String
   isRegistered   Boolean
-  trip           trip[]
 }
 
 model Client {
   id             Int      @id @default(autoincrement())
   createdAt      DateTime @default(now())
   balance        String
-  user           String?  @unique
+  user           String   @unique
   clientId       String
   isRegistered   Boolean
   hasSomeBalance Boolean
-  trip           trip[]
 }
 
-model trip {
+model Trip {
   id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now())
   fare        String
   charges     String
-  rider       Rider    @relation(fields: [rId], references: [id])
-  client      Client   @relation(fields: [cId], references: [id])
+  rider       String?
+  client      String
   distance    String
-  tripId      String
+  tripId      String   @unique
   tripStarted Boolean
   isCompleted Boolean
-  IsPainOut   Boolean
-  pickup      String?
-  destination String?
-  cId         Int      @unique
-  rId         Int      @unique
-  // relational
+  isPaidOut   Boolean
+  pickup      String
+  destination String
 }
 
 model Transaction {
-  id         Int    @id @default(autoincrement())
-  createdAt DateTime
-  txHash     String
-  gasUsed  String
-  to         String
-  from       String
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  txHash    String
+  gasUsed   String
+  to        String
+  from      String
 }

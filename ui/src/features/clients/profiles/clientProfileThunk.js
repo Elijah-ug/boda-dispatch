@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getContract } from "../../../contract/contract";
 import { toast } from "react-toastify";
 import { formatEther } from "ethers";
+import { fetchClientEndPoint } from "./registerClientRoute";
 export const fetchClientProfileThunk = createAsyncThunk(
   "client/fetchClientProfileThunk",
   async ({ address }, { rejectWithValue, dispatch }) => {
@@ -18,7 +19,7 @@ export const fetchClientProfileThunk = createAsyncThunk(
         isRegistered: clientInfo[3],
         hasSomeBalance: clientInfo[4],
       };
-
+      await dispatch(fetchClientEndPoint(clientProfile));
       console.log("clientProfile " + clientProfile);
       return clientProfile;
     } catch (error) {

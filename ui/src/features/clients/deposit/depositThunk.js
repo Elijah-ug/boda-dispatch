@@ -26,10 +26,10 @@ export const fetchClientDepositThunk = createAsyncThunk(
       const tx = await contract.clientDeposit(amount);
       const deposit = await tx.wait();
       const txDetails = {
-        txHash: deposit.hash,
-        gasUsed: deposit.gasUsed,
-        to: deposit.to,
-        from: deposit.from,
+        txHash: String(deposit.hash),
+        gasUsed: deposit.gasUsed?.toString(),
+        to: String(deposit.to),
+        from: String(deposit.from),
       };
       await dispatch(transactionDetailsRoute(txDetails));
       console.log("client deposited: ", deposit);
