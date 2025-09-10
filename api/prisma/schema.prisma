@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -14,35 +13,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model rider {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-
+model Rider {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
   riderId      Int
-  user         String
+  user         String   @unique
   earnings     Int
   stars        Int
-  totalTrips   Boolean
+  totalTrips   Int
   isRegistered Boolean
+  trip         trip[]
 }
 
-model client {
+model Client {
   id             Int      @id @default(autoincrement())
   createdAt      DateTime @default(now())
   balance        Int
-  user           String
-  clientId       String
+  user           String   @unique
+  clientId       Int
   isRegistered   Boolean
   hasSomeBalance Boolean
+  trip           trip[]
 }
 
 model trip {
-  id             Int      @id @default(autoincrement())
-  createdAt      DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
   fare        Int
-  charges           Int
-  rider       String
-  client String
-  isRegistered   Boolean
-  hasSomeBalance Boolean
+  charges     Int
+  rider       Rider    @relation(fields: [rId], references: [id])
+  client      Client   @relation(fields: [cId], references: [id])
+  distance    String
+  tripId      Int
+  tripStarted Boolean
+  isCompleted Boolean
+  IsPainOut   Boolean
+  pickup      String?
+  destination String?
+  cId         Int      @unique
+  rId         Int      @unique
+  // relational
 }
