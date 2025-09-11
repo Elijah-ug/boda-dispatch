@@ -19,11 +19,11 @@ contract BodaBlocks is
     // ===> Trip Struct
     struct Trip {
         uint256 fare; // slot 0
-        uint256 charges;
         address rider; // slot 2 (20 bytes)
         address client; // slot 3 (20 bytes)
         uint64 distance; // slot 1 (distance in km)
         uint32 tripId; // slot 4 (4 bytes)
+        bool isAccepted;
         bool tripStarted; // slot 4 (1 byte)
         bool isCompleted; // slot 4 (1 byte)
         bool isPaidOut; // slot 4 (1 byte)
@@ -170,14 +170,13 @@ contract BodaBlocks is
         require(clientProfiles[msg.sender].balance >= _fare, "Low fare");
         uint256 tripId = nextTripId++;
         client.balance -= _fare;
-        uint256 charge = (_fare * percentageFee) / 1000;
         trips[tripId] = Trip({
             fare: _fare,
-            charges: charge,
             rider: address(0),
             client: msg.sender,
             distance: _distance,
             tripId: uint32(tripId),
+            isAccepted: false,
             tripStarted: false,
             isCompleted: false,
             isPaidOut: false,
@@ -193,11 +192,12 @@ contract BodaBlocks is
     ) external onlyRider nonReentrant {
         Trip storage newTrip = trips[_tripId];
         require(newTrip.client != address(0), "Invalid Trip");
-        require(newTrip.rider == address(0), "Trip already accepted");
+        require(newTrip.rider == address(0), "Has rider");
+        require(!newTrip.isAccepted, "Trip already accepted");
         require(!newTrip.isCompleted, "Trip completed");
         require(!newTrip.tripStarted, "Trip started");
-        // Client storage client = clientProfiles[newTrip.client];
         require(newTrip.fare > 0, "No locked fare");
+        newTrip.isAccepted = true;
         newTrip.rider = msg.sender;
     }
     // trigger start trip
@@ -235,12 +235,9 @@ contract BodaBlocks is
         require(trip.client != address(0), "Invalid trip");
         require(trip.rider != address(0), "No rider");
         Rider storage rider = riderProfiles[trip.rider];
-        uint256 netPayment = trip.fare - trip.charges;
-        rider.earnings += netPayment;
-        platformFee += trip.charges;
+        rider.earnings += trip.fare;
         rider.completedTrips += 1;
         rider.totalTrips += 1;
-
         trip.isPaidOut = true;
 
         emit TripCompleted(_tripId, trip.rider, rider.completedTrips);
@@ -252,8 +249,11 @@ contract BodaBlocks is
     ) external onlyRider nonReentrant {
         Rider storage rider = riderProfiles[msg.sender];
         require(_amount > 0 && rider.earnings >= _amount, "Invalid amount");
+        uint256 fee = (_amount * percentageFee) / 1000;
+        uint256 netWithdraw = _amount -= fee;
         rider.earnings -= _amount;
-        stableToken.safeTransfer(msg.sender, _amount);
+        platformFee += fee;
+        stableToken.safeTransfer(msg.sender, netWithdraw);
 
         emit RiderWithdraw(msg.sender, _amount);
     }
@@ -263,9 +263,9 @@ contract BodaBlocks is
         Client storage client = clientProfiles[msg.sender];
         require(_amount > 0 && client.balance >= _amount, "Invalid amount");
         uint256 fee = (_amount * percentageFee) / 1000;
+        uint256 netWithdraw = _amount -= fee;
         client.balance -= _amount;
         platformFee += fee;
-        uint256 netWithdraw = _amount -= fee;
         stableToken.safeTransfer(msg.sender, netWithdraw);
 
         emit ClientWithdraw(msg.sender, _amount);
@@ -277,49 +277,36 @@ contract BodaBlocks is
     }
     // ===> Chainlink Automation
 
-    function checkUpkeep(
-        bytes calldata
-    )
-        external
-        view
-        override
-        returns (bool upkeepNeeded, bytes memory performData)
-    {
-        for (uint256 i = unpaidQueueIndex; i < unpaidTripQueue.length; i++) {
-            uint256 id = unpaidTripQueue[i];
-            if (id == 0) {
-                continue;
-            }
-
-            Trip memory trip = trips[id];
-
+    function checkUpkeep( bytes calldata ) external view override
+        returns (bool upkeepNeeded, bytes memory performData){
+            uint256 tripsToPay = 0;
+            uint256 maxTripsToCheck = 100; // Prevent gas spikes 
+        for (uint256 i = 1; i <= nextTripId && tripsToPay < maxTripsToCheck; i++) {
+            Trip storage trip = trips[i];
             if (trip.isCompleted && !trip.isPaidOut) {
-                return (true, abi.encode(id));
+                tripsToPay ++;
             }
+
         }
+        upkeepNeeded = (tripsToPay > 0);
+        performData = abi.encode(tripsToPay);
         return (false, "");
     }
     // performUpkeep will clear the queue entry (set to 0) and advance unpaidQueueIndex when possible,
     // then call rewardTripRiderByFare to process payment.
     function performUpkeep(bytes calldata performData) external override {
-        uint256 tripId = abi.decode(performData, (uint256));
+        uint256 tripsToPay = abi.decode(performData, (uint256));
+         uint256 processed = 0;
+         uint256 maxTripsToCheck = 100; // Same limit as checkUpkeep
         // find and clear the queued entry (we don't shift the array; we set slot to 0)
-        for (uint256 i = unpaidQueueIndex; i < unpaidTripQueue.length; i++) {
-            if (unpaidTripQueue[i] == tripId) {
-                unpaidTripQueue[i] = 0;
-                // advance unpaidQueueIndex while front slots are zero
-                while (
-                    unpaidQueueIndex < unpaidTripQueue.length &&
-                    unpaidTripQueue[unpaidQueueIndex] == 0
-                ) {
-                    unpaidQueueIndex++;
-                }
+        for (uint256 i = 1; i < nextTripId && processed < tripsToPay && processed < maxTripsToCheck; i++) {
+             Trip storage trip = trips[i];
+            if (trip.isCompleted && !trip.isPaidOut) {
+               rewardTripRiderByFare(trip.tripId);
+               processed ++;
+            }
             }
         }
-        // perform the actual reward (To revert if client balance is insufficient)
-
-        rewardTripRiderByFare(tripId);
-    }
 
     // ===> View Functions
     function getRiderInfo(address _rider) external view returns (Rider memory) {

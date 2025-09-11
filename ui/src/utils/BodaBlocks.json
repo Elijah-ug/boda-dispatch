@@ -521,11 +521,6 @@
               "type": "uint256"
             },
             {
-              "internalType": "uint256",
-              "name": "charges",
-              "type": "uint256"
-            },
-            {
               "internalType": "address",
               "name": "rider",
               "type": "address"
@@ -544,6 +539,11 @@
               "internalType": "uint32",
               "name": "tripId",
               "type": "uint32"
+            },
+            {
+              "internalType": "bool",
+              "name": "isAccepted",
+              "type": "bool"
             },
             {
               "internalType": "bool",
@@ -870,11 +870,6 @@
           "type": "uint256"
         },
         {
-          "internalType": "uint256",
-          "name": "charges",
-          "type": "uint256"
-        },
-        {
           "internalType": "address",
           "name": "rider",
           "type": "address"
@@ -893,6 +888,11 @@
           "internalType": "uint32",
           "name": "tripId",
           "type": "uint32"
+        },
+        {
+          "internalType": "bool",
+          "name": "isAccepted",
+          "type": "bool"
         },
         {
           "internalType": "bool",

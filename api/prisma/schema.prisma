@@ -38,11 +38,11 @@ model Trip {
   id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now())
   fare        String
-  charges     String
   rider       String?
   client      String
   distance    String
   tripId      String   @unique
+  isAccepted  Boolean
   tripStarted Boolean
   isCompleted Boolean
   isPaidOut   Boolean

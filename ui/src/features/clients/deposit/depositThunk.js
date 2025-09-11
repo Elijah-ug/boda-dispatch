@@ -31,7 +31,9 @@ export const fetchClientDepositThunk = createAsyncThunk(
         to: String(deposit.to),
         from: String(deposit.from),
       };
+      const address = txDetails.from;
       await dispatch(transactionDetailsRoute(txDetails));
+      await dispatch(fetchClientProfileThunk({ address }));
       console.log("client deposited: ", deposit);
       console.log(txDetails);
       toast.success("Client deposited successifully!");
