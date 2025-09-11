@@ -20,7 +20,8 @@ export const fetchRiderWithdrawThunk = createAsyncThunk(
       toast.success("Trip Completed successifully!");
       return txDetails;
     } catch (error) {
-      rejectWithValue(error.message);
+      console.log(error.message);
+      return rejectWithValue(error.message);
     }
   }
 );

@@ -14,11 +14,11 @@ export const fetchTripThunk = createAsyncThunk("trips/fetchTripThunk", async (_,
     const trip = await contract.getTripDetails(currentTripId);
     const tripInfo = {
       fare: formatEther(trip.fare.toString()),
-      charges: formatEther(trip.charges.toString()),
       rider: trip.rider,
       client: trip.client,
       distance: trip.distance.toString(),
       tripId: trip.tripId.toString(),
+      isAccepted: trip.isAccepted,
       tripStarted: trip.tripStarted,
       isCompleted: trip.isCompleted,
       isPaidOut: trip.isPaidOut,
