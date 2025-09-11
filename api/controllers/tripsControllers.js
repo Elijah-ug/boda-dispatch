@@ -3,18 +3,29 @@ import { prisma } from "../prisma/client.js";
 export const addTrip = async (req, res) => {
   try {
     console.log("We gat the data ==>", req.body);
-    const { fare, charges, rider, client, distance, tripId, tripStarted, isCompleted, isPaidOut, pickup, destination } =
-      req.body;
+    const {
+      fare,
+      rider,
+      client,
+      distance,
+      tripId,
+      isAccepted,
+      tripStarted,
+      isCompleted,
+      isPaidOut,
+      pickup,
+      destination,
+    } = req.body;
     const trips = await prisma.trip.upsert({
       where: { tripId },
-      update: { rider, tripStarted, isCompleted, isPaidOut, pickup },
+      update: { rider, tripStarted, isAccepted, isCompleted, isPaidOut, pickup },
       create: {
         fare,
-        charges,
         rider,
         client,
         distance,
         tripId,
+        isAccepted,
         tripStarted,
         isCompleted,
         isPaidOut,
@@ -33,7 +44,8 @@ export const addTrip = async (req, res) => {
 export const getTrip = async (req, res) => {
   try {
     console.log("We gat the data");
-    res.status(200).json({ message: "We gochu" });
+    const trips = await prisma.trip.findMany();
+    res.status(200).json(trips);
   } catch (error) {
     console.log(error.message);
   }

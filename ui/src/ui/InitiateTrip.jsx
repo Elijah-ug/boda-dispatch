@@ -102,8 +102,17 @@ export default function InitiateTrip() {
       "calculatedFare=>",
       calculatedFare
     );
-    console.log(fare);
-    if (pickup && destination && distance && fare) {
+    console.log(
+      "pickup: ",
+      pickup,
+      "destination: ",
+      destination,
+      "distance: ",
+      distance,
+      "calculatedFare",
+      calculatedFare
+    );
+    if (pickup && destination && distance && calculatedFare) {
       dispatch(
         fetchInitiateTripThunk({
           pickup,

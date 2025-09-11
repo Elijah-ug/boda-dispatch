@@ -6,14 +6,16 @@ import { useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { fetchAvailableTrips } from "@/features/readData/trips";
+import { acceptTripThunk } from "@/features/riders/trigger/acceptTripThunk";
 
 export const AvailableClients = () => {
   const [clients, setClients] = useState([]);
   // const [copied, setCopied] = useState(false);
   // const [clientAddress, setClientAddress] = useState("");
-  // const { tripInfo } = useSelector((state) => state.trips);
-  // const dispatch = useDispatch();
-  // console.log(tripInfo);
+  const { newTrips, loading, error } = useSelector((state) => state.newTrip);
+  const dispatch = useDispatch();
+  console.log("newTrips==> ", newTrips);
   // useEffect(() => {
   //   dispatch(fetchCurrentTripId())
   //     .unwrap()
@@ -26,18 +28,19 @@ export const AvailableClients = () => {
   //     });
   // }, []);
 
-  const availableClients = async () => {
-    try {
-      const res = await fetch(import.meta.env.VITE_CLIENT_URL);
-      const data = await res.json();
-      setClients(data);
-      console.log(data);
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
+  // const availableClients = async () => {
+  //   try {
+  //     const res = await fetch(import.meta.env.VITE_CLIENT_URL);
+  //     const data = await res.json();
+  //     setClients(data);
+  //     console.log(data);
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // };
   useEffect(() => {
-    availableClients();
+    // availableClients();
+    // dispatch(fetchAvailableTrips());
   }, []);
   const handleCopyAddress = (addr) => {
     setClientAddress(addr);
@@ -46,7 +49,8 @@ export const AvailableClients = () => {
     setTimeout(() => setCopied(false), 1500);
   };
   return (
-    <div className="p-3 sm:px-10">
+    <div className="p-3 sm:px-10 text-gray-200">
+      <h1>Hello world</h1>
       <div className="grid grid-cols-2 sm:grid-cols-3">
         {clients.length > 0 ? (
           <Card className="w-xs max-w-lg bg-gray-600 border-none text-gray-200">

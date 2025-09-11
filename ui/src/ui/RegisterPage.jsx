@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { autoConnectWallet, connectWallet } from "../features/wallet/connectWallet";
 import { fetchRegisterClientThunk } from "../features/clients/auth/registerThunk";
@@ -24,6 +24,7 @@ const RegisterPage = () => {
     if (address) {
       dispatch(fetchClientProfileThunk({ address }));
       dispatch(fetchRiderProfileThunk({ address }));
+      dispatch(fetchClientProfileThunk({ address }));
     }
   }, [address]);
   console.log("riderProfile: ", riderProfile);

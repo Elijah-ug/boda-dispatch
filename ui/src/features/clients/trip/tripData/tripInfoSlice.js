@@ -1,17 +1,17 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { fetchTripThunk } from './tripThunk';
+import { createSlice } from "@reduxjs/toolkit";
+import { fetchTripThunk } from "./tripThunk";
 
 const initialState = {
   tripInfo: {
-    fare: '0',
-    charges: '0',
-    rider: '',
+    fare: "0",
+    rider: "",
     client: null,
-    distance: '',
-    startTime: '',
-    endTime: '',
-    duration: '',
-    tripId: '0',
+    distance: "",
+    startTime: "",
+    endTime: "",
+    duration: "",
+    tripId: "0",
+    isAccepted: false,
     tripStarted: false,
     isCompleted: false,
     isPaidOut: false,
@@ -20,11 +20,11 @@ const initialState = {
   error: null,
 };
 const tripInfoSlice = createSlice({
-  name: 'trips',
+  name: "trips",
   initialState,
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
-      .addCase(fetchTripThunk.pending, state => {
+      .addCase(fetchTripThunk.pending, (state) => {
         state.loading = true;
       })
       .addCase(fetchTripThunk.fulfilled, (state, action) => {
@@ -33,7 +33,7 @@ const tripInfoSlice = createSlice({
       })
       .addCase(fetchTripThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Unknown error';
+        state.error = action.payload || "Unknown error";
       });
   },
 });
