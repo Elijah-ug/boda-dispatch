@@ -26,6 +26,7 @@ export const addTrip = async (req, res) => {
     res.status(200).json(trips);
   } catch (error) {
     console.log(error.message);
+    res.status(409).json({ message: `An error occured ==> ${error.message}` });
   }
 };
 
