@@ -49,8 +49,7 @@ export const AvailableClients = () => {
     setTimeout(() => setCopied(false), 1500);
   };
   return (
-    <div className="min-h-screen p-3 sm:px-10 text-gray-200
-      <h1>Hello world</h1>
+    <div className="min-h-screen p-3 sm:px-10 text-gray-200">
       <div className="grid grid-cols-2 sm:grid-cols-3">
         {clients.length > 0 ? (
           <Card className="w-xs max-w-lg bg-gray-600 border-none text-gray-200">

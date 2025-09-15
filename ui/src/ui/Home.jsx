@@ -17,12 +17,12 @@ export default function Home() {
         backgroundImage: `url(${bajaji})`,
       }}
     >
-      <div className="   ">
+      <div className=" ">
         <h2 className="font-bold text-amber-400 text-center pt-5 text-lg sm:text-4xl">
           BodaBlocks, A Decentralized Boda Boda Dispatch{" "}
         </h2>
 
-        <div className=" p-6 flex items-center justify-center ">
+        <div className=" flex items-center justify-center ">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl w-full">
             {/* <!-- Card 1: How Aggregator Works --> */}
             <div className="bg-gray-100/30 backdrop-blur-md border border-gray-200/40 shadow-md rounded-md p-6 text-white">
