@@ -38,7 +38,7 @@ export default function Trips() {
   const trips = [];
   return (
     <div>
-      <div className="bg-white p-4 rounded-xl shadow col-span-1 md:col-span-2">
+      <div className="bg-gray-700 text-white p-4 rounded-xl shadow col-span-1 md:col-span-2">
         <h2 className="text-xl font-semibold mb-2">📦 Recent Trip Details</h2>
         {tripInfo ? (
           <div className="border-b py-2 flex justify-between items-center gap-4">

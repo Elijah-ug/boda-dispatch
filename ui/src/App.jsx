@@ -16,6 +16,7 @@ import AdminDashboard from "./ui/admin/AdminDashboard";
 import InitiateTrip from "./ui/InitiateTrip";
 import { AvailableClients } from "./ui/AvailableClients";
 import { Foot } from "./ui/Foot";
+import { MobileNavBar } from "./ui/navigation/MobileNavBar";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -49,6 +50,7 @@ export default function App() {
     <div className="">
       <div className="">
         <NavBar />
+        <MobileNavBar />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="register" element={<RegisterPage />} />
