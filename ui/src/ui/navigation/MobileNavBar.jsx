@@ -38,9 +38,9 @@ export const MobileNavBar = () => {
             Client Dashboard
           </NavLink>
 
-          <NavLink onClick={() => setIsMenuOpen(false)} to="admin" className="py-2 px-3 hover:bg-green-600 rounded">
+          {/* <NavLink onClick={() => setIsMenuOpen(false)} to="admin" className="py-2 px-3 hover:bg-green-600 rounded">
             Admin Dashboard
-          </NavLink>
+          </NavLink> */}
 
           <NavLink
             onClick={() => setIsMenuOpen(false)}
