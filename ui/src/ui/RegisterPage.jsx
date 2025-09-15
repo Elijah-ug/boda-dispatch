@@ -30,15 +30,12 @@ const RegisterPage = () => {
   console.log("riderProfile: ", riderProfile);
 
   return (
-    <div className="bg-gray-700">
-      <div className="text-end mr-10 pt-4">
-        <Wallet />
-      </div>
+    <div className="min-h-screen">
       <div className="min-h-screen p-4  flex flex-col items-center gap-8">
-        <h1 className="text-3xl font-bold mt-4">Register</h1>
+        <h1 className="text-lg sm:text-3xl font-bold text-gray-200 mt-4">Register</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
           {/* Client Card */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
+          <div className="bg-gray-100/30 backdrop-blur-md border border-gray-200/40 shadow-md rounded-md p-6 text-white">
             <h2 className="text-xl font-semibold mb-4">Register as Client</h2>
             {!address && (
               <button
@@ -57,7 +54,7 @@ const RegisterPage = () => {
           </div>
 
           {/* Rider Card */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
+          <div className="bg-gray-100/30 backdrop-blur-md border border-gray-200/40 shadow-md rounded-md p-6 text-white">
             <h2 className="text-xl font-semibold mb-4">Register as Rider</h2>
             {!address && (
               <button
@@ -80,10 +77,13 @@ const RegisterPage = () => {
             <span className="pr-2">Registeration Status:</span>
             {clientProfile?.isRegistered ? "Registered" : riderProfile?.isRegistered ? "Registered" : "Not Registered"}
           </h3>
-          <h3 className="font-blod">
-            <span className="pr-2">Registered As:</span>
-            {(clientProfile?.isRegistered && "Client") || (riderProfile?.isRegistered && "Rider")}
-          </h3>
+          {clientProfile?.isRegistered ||
+            (riderProfile?.isRegistered && (
+              <h3 className="font-blod">
+                <span className="pr-2">Registered As:</span>
+                {(clientProfile?.isRegistered && "Client") || (riderProfile?.isRegistered && "Rider")}
+              </h3>
+            ))}
         </div>
       </div>
     </div>

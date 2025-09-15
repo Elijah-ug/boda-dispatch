@@ -17,7 +17,7 @@ export const addClient = async (req, res) => {
 };
 export const getClients = async (req, res) => {
   try {
-    const clients = await client.client.findMany({
+    const clients = await prisma.client.findMany({
       take: 10,
       skip: 0,
     });

@@ -2,12 +2,14 @@ import { prisma } from "../prisma/client.js";
 
 export const addTxHistory = async (req, res) => {
   const { txHash, gasUsed, to, from } = req.body;
+  console.log("transaction ready", req.body);
   const tx = await prisma.transaction.create({ data: { txHash, gasUsed, to, from } });
   console.log("transaction updated: ", tx);
   res.status(200).json(tx);
   try {
   } catch (error) {
     console.log(error.message);
+    res.status(409).json({ message: `An error occured ==> ${error.message}` });
   }
 };
 

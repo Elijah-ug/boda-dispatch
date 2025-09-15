@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { fetchInitiateTripThunk } from "@/features/clients/trip/initiateTrip/initiateTripThunk";
+import { Label } from "@radix-ui/react-label";
 import { parseEther } from "ethers";
 import { getDistance } from "geolib";
 import { IPInfoContext } from "ip-info-react";
@@ -128,42 +129,28 @@ export default function InitiateTrip() {
 
   return (
     <div>
-      <Card className="w-full max-w-lg bg-gray-600 border-none">
+      <Card className="w-full max-w-lg bg-gray-700 border-none text-white">
         <CardHeader>
           <CardTitle className="text-gray-300">Destination</CardTitle>
         </CardHeader>
-        <CardContent>
-          <form>
-            <div className="flex flex-col gap-6">
-              {/* <div className="grid gap-2">
-                <Input
-                  id="pickup"
-                  type="text"
-                  value={pickup}
-                  onChange={e => setPickup(e.target.value)}
-                  placeholder="Kisaasi"
-                  required
-                />
-              </div> */}
+        <CardContent className="grid gap-6">
+          <div className="grid gap-3">
+            <Label htmlFor="destination"> Where are you heading?</Label>
+            <Input
+              id="distance"
+              type="text"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
+              placeholder="Kisaasi"
+              required
+            />
+          </div>
 
-              <div className="grid gap-2">
-                <Input
-                  id="distance"
-                  type="text"
-                  value={destination}
-                  onChange={(e) => setDestination(e.target.value)}
-                  placeholder="Kisaasi"
-                  required
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Button type="button" onClick={handleSubmitDestination} className="w-full">
-                  Initiate Trip
-                </Button>
-              </div>
-            </div>
-          </form>
+          <div className="grid gap-2">
+            <Button type="button" onClick={handleSubmitDestination} className="w-full">
+              Initiate Trip
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

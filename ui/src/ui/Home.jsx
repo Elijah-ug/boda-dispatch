@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import Wallet from './Wallet';
-import { NavLink } from 'react-router-dom';
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import bajaji from "../assets/bajaji.png";
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -10,27 +9,23 @@ export default function Home() {
   useEffect(() => {
     // dispatch(())
   }, []);
-  const handleUpdateYield = async () => {
-    try {
-      const res = await fetch('http://localhost:5000/update-yield', { method: 'POST' });
-      const data = await res.json();
-      console.log(data);
-    } catch (error) {}
-  };
+
   return (
-    <div className="img bg-gray-700">
-      <div>
-        <div className="text-end mr-10 pt-4 ">
-          <Wallet />
-        </div>
-        <h2 className="font-bold text-amber-400 text-center pt-5 text-4xl">
-          BodaBlocks, A Decentralized Boda Boda Dispatch{' '}
+    <div
+      className="min-h-screen  px-3 sm:px-10 py-5 sm:py-10 bg-center bg-no-repeat "
+      style={{
+        backgroundImage: `url(${bajaji})`,
+      }}
+    >
+      <div className="   ">
+        <h2 className="font-bold text-amber-400 text-center pt-5 text-lg sm:text-4xl">
+          BodaBlocks, A Decentralized Boda Boda Dispatch{" "}
         </h2>
 
-        <div className=" p-6 flex items-center justify-center mt-10">
+        <div className=" p-6 flex items-center justify-center ">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl w-full">
             {/* <!-- Card 1: How Aggregator Works --> */}
-            <div className="bg-indigo-500 shadow-2xl rounded-2xl p-6 text-white">
+            <div className="bg-gray-100/30 backdrop-blur-md border border-gray-200/40 shadow-md rounded-md p-6 text-white">
               <h2 className="text-xl font-bold  mb-4">⚙️ How It Works</h2>
               <p className=" leading-relaxed">
                 Users register as either a Boda rider or a client. Clients deposit funds and request trips, selecting a
@@ -40,7 +35,7 @@ export default function Home() {
               </p>
             </div>
             {/* <!-- Card 2: Project Data --> */}
-            <div className="bg-violet-800 shadow-2xl rounded-2xl p-6 text-white">
+            <div className="bg-gray-100/30 backdrop-blur-md border border-gray-200/40 shadow-md rounded-md p-6 text-white">
               <h2 className="text-xl font-bold mb-4">Why It Matters (Impact Card)</h2>
               <p className=" leading-relaxed">
                 In many parts of Africa, informal transport systems lack transparency, safety, and trust. This dApp
