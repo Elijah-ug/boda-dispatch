@@ -3,7 +3,7 @@ import Wallet from "../Wallet";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { autoConnectWallet } from "@/features/wallet/connectWallet";
-export default function NavBar() {
+export const NavBar = () => {
   const { address } = useSelector((state) => state.auth);
   const { clientProfile } = useSelector((state) => state.client);
   const { riderProfile } = useSelector((state) => state.rider);
@@ -31,4 +31,4 @@ export default function NavBar() {
       </div>
     </div>
   );
-}
+};
