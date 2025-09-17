@@ -55,7 +55,7 @@ const ClientDashbard = () => {
               </p>
               <p className="text-start">
                 <span className="pr-2">Balance:</span>
-                {`${clientProfile?.balance? (formatUnits(clientProfile?.balance)) : "0"} AFB`}
+                {`${clientProfile?.balance ? formatUnits(clientProfile?.balance) : "0"} AFB`}
               </p>
             </div>
           </CardContent>
