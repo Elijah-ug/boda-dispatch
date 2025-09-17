@@ -44,9 +44,9 @@ export default function InitiateTrip() {
           )}&key=b69b036ac3324887a08a2a335f2f2254`
         );
         const data = await currentLocation.json();
-        console.log(data);
+        // console.log(data);
         const relevant = await data.results[0].bounds.northeast;
-        console.log("relevant: ", relevant);
+        // console.log("relevant: ", relevant);
         setDestinationIp({ longitude: relevant?.lng, latitude: relevant?.lat });
 
         // const distanceInMeters = getDistance(location, destinationIp);
@@ -65,7 +65,7 @@ export default function InitiateTrip() {
     if (location && destinationIp.latitude && destinationIp.longitude) {
       const dist = getDistance(location, destinationIp);
       setDistance(dist / 1000);
-      console.log("Geolib distance: ", destinationIp, location, `${dist / 1000} km`);
+      // console.log("Geolib distance: ", destinationIp, location, `${dist / 1000} km`);
     }
   }, [destinationIp, location]);
 
@@ -77,12 +77,12 @@ export default function InitiateTrip() {
         const data = await res.json();
         const name = await data.features[0].properties.name;
         setPickup(name);
-        console.log("data fetched is ==>", data, "My location is name: =>", name);
+        // console.log("data fetched is ==>", data, "My location is name: =>", name);
         return name;
       } catch (error) {}
     };
     getcurrentPlaceName();
-    console.log("pickup ===>: ", pickup);
+    // console.log("pickup ===>: ", pickup);
   }, [location]);
   useEffect(() => {
     if (destination) {
@@ -95,24 +95,24 @@ export default function InitiateTrip() {
     const calculatedFare = Math.floor((parsedBaseFare + parseFloat(distance) * parsedPerKmRate) * 100) / 100;
     setFare(calculatedFare);
     // const distanceMeters = Math.round(parseFloat(route) * 1000);
-    console.log(
-      "parsedBaseFare==>",
-      parsedBaseFare,
-      "parsedPerKmRate==>",
-      parsedPerKmRate,
-      "calculatedFare=>",
-      calculatedFare
-    );
-    console.log(
-      "pickup: ",
-      pickup,
-      "destination: ",
-      destination,
-      "distance: ",
-      distance,
-      "calculatedFare",
-      calculatedFare
-    );
+    // console.log(
+    //   "parsedBaseFare==>",
+    //   parsedBaseFare,
+    //   "parsedPerKmRate==>",
+    //   parsedPerKmRate,
+    //   "calculatedFare=>",
+    //   calculatedFare
+    // );
+    // console.log(
+    //   "pickup: ",
+    //   pickup,
+    //   "destination: ",
+    //   destination,
+    //   "distance: ",
+    //   distance,
+    //   "calculatedFare",
+    //   calculatedFare
+    // );
     if (pickup && destination && distance && calculatedFare) {
       dispatch(
         fetchInitiateTripThunk({

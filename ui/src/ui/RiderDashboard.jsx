@@ -8,26 +8,39 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useAccount, useReadContract } from "wagmi";
+import { bodaContractConfig } from "@/contract/wagmiContractConfig";
 
 const RiderDashboard = ({ riderData, assignedTrips, onWithdraw }) => {
   const [withdrawAmount, setWithdrawAmount] = useState("");
-  const dispatch = useDispatch();
-  const { riderProfile } = useSelector((state) => state.rider);
+  // const dispatch = useDispatch();
+  // const { riderProfile } = useSelector((state) => state.rider);
   const { tripInfo } = useSelector((state) => state.trips);
-  const { address } = useSelector((state) => state.auth);
-  console.log("riderProfile.isRegistered: ", riderProfile.isRegistered);
+  // const { address } = useSelector((state) => state.auth);
+  // console.log("riderProfile.isRegistered: ", riderProfile.isRegistered);
 
-  useEffect(() => {
-    dispatch(autoConnectWallet());
-    dispatch(fetchRiderProfileThunk({ address }));
-  }, [address]);
-  useEffect(() => {
-    dispatch(fetchCurrentTripId())
-      .unwrap()
-      .then((tripId) => {
-        dispatch(fetchTripThunk({ tripId }));
-      });
-  }, []);
+  // useEffect(() => {
+  //   dispatch(autoConnectWallet());
+  //   dispatch(fetchRiderProfileThunk({ address }));
+  // }, [address]);
+  // useEffect(() => {
+  //   dispatch(fetchCurrentTripId())
+  //     .unwrap()
+  //     .then((tripId) => {
+  //       dispatch(fetchTripThunk({ tripId }));
+  //     });
+  // }, []);
+
+  const { address } = useAccount();
+  const {
+    data: riderProfile,
+    error,
+    isPending,
+  } = useReadContract({
+    ...bodaContractConfig,
+    functionName: "getRiderInfo",
+    args: [address],
+  });
   const showTripInfo = riderProfile?.user?.toLowerCase() === tripInfo?.rider?.toLowerCase();
   console.log("Number(tripInfo.tripId) : " + typeof Number(tripInfo.tripId));
   console.log("tripInfo.rider: ", tripInfo.rider);

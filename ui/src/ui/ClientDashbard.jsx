@@ -7,16 +7,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import Trips from "./Trips";
 import { ClientAccess } from "./client/ClientAccess";
+import { useAccount, useReadContract } from "wagmi";
+import { UseClientProfile } from "./client/UseClientProfile";
+import { useClientProfileTest } from "./client/Test";
+import { bodaContractConfig } from "@/contract/wagmiContractConfig";
 
 const ClientDashbard = () => {
-  const dispatch = useDispatch();
-  const { clientProfile } = useSelector((state) => state.client);
-  const { address } = useSelector((state) => state.auth);
-  console.log("clientProfile.isRegistered: ", clientProfile);
-  useEffect(() => {
-    dispatch(autoConnectWallet());
-    dispatch(fetchClientProfileThunk({ address }));
-  }, [address]);
+  const { address } = useAccount();
+  // const { profile: clientProf, loading, error } = UseClientProfile(address);
+  const {
+    data: clientProfile,
+    error,
+    isPending,
+  } = useReadContract({
+    ...bodaContractConfig,
+    functionName: "getClientInfo",
+    args: [address],
+  });
+  // console.log(bodaContractConfig);
+  // console.log("clientProf data ======>: ", data, "loading: ", isPending, "error: ", error);
+
+  // console.log("clientProf data ======>: ", data, "loading: ", isPending, "error: ", error);
+
   const isClient = clientProfile?.user?.toLowerCase() === address?.toLowerCase();
   console.log("Is Client: ", isClient);
   return (
@@ -38,7 +50,7 @@ const ClientDashbard = () => {
               </p>
               <p className="text-start">
                 <span>Status: </span>
-                {clientProfile.isRegistered ? "✅ Registered as Client" : "❌ Not Registered"}
+                {clientProfile?.isRegistered ? "✅ Registered as Client" : "❌ Not Registered"}
               </p>
               <p className="text-start">
                 <span className="pr-2">Balance:</span>
@@ -50,9 +62,7 @@ const ClientDashbard = () => {
       </div>
 
       <div className=" max-w-6xl mx-auto space-y-6">
-      
         <div className="flex flex-col mt-15 sm:flex-row gap-5 items-center justify-around ">
-          
           <ClientAccess />
           <div className="">
             {isClient ? (
