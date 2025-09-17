@@ -11,6 +11,7 @@ import { useAccount, useReadContract } from "wagmi";
 import { UseClientProfile } from "./client/UseClientProfile";
 import { useClientProfileTest } from "./client/Test";
 import { bodaContractConfig } from "@/contract/wagmiContractConfig";
+import { formatUnits } from "ethers";
 
 const ClientDashbard = () => {
   const { address } = useAccount();
@@ -54,7 +55,7 @@ const ClientDashbard = () => {
               </p>
               <p className="text-start">
                 <span className="pr-2">Balance:</span>
-                {`${clientProfile?.balance} AFB`}
+                {`${clientProfile?.balance? (formatUnits(clientProfile?.balance)) : "0"} AFB`}
               </p>
             </div>
           </CardContent>
