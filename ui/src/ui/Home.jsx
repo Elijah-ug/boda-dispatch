@@ -1,13 +1,18 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import bajaji from "../assets/bajaji.png";
+import { useBodaBlocks } from "@/contract/contractConnect";
+import { usePublicClient, useWalletClient } from "wagmi";
 
 export default function Home() {
   const dispatch = useDispatch();
   //   const { loading, bestYield, error } = useSelector((state) => state.yield);
   //   console.log("best bestYield", bestYield.apy)
+  const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient()
+  console.log("publicClient ", walletClient);
   useEffect(() => {
-    // dispatch(())
+    // useBodaBlocks();
   }, []);
 
   return (

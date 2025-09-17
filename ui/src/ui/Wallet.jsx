@@ -24,7 +24,8 @@ export default function Wallet() {
   };
   return (
     <div>
-      {isConnected ? (
+      <ConnectButton />
+      {/* {isConnected ? (
         <div onClick={() => handleCopyAddress(address)} className="flex items-center gap-1 text-sm cursor-pointer">
           {address.slice(0, 7)}...{address.slice(-5)}
           {copiedAddress === address && copied ? (
@@ -40,7 +41,7 @@ export default function Wallet() {
         <div>
           <ConnectButton />
         </div>
-      )}
+      )} */}
       {/* {!address && (
         <button
           onClick={() => dispatch(connectWallet())}
