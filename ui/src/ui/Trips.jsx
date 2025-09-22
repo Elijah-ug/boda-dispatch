@@ -1,41 +1,51 @@
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchCurrentTripId } from '../features/clients/trip/tripData/currentTripIdThunk';
-import { fetchTripThunk } from '../features/clients/trip/tripData/tripThunk';
-import { fetchCompleteTripThunk } from '../features/clients/trip/complete/completeTrip';
-import { toast } from 'react-toastify';
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCurrentTripId } from "../features/clients/trip/tripData/currentTripIdThunk";
+import { fetchTripThunk } from "../features/clients/trip/tripData/tripThunk";
+import { fetchCompleteTripThunk } from "../features/clients/trip/complete/completeTrip";
+import { toast } from "react-toastify";
+import { useReadContract } from "wagmi";
+import { bodaContractConfig } from "@/contract/wagmiContractConfig";
+import { registerTripEndPoint } from "@/features/public/tripRoute";
+import { formatEther, formatUnits } from "ethers";
 
 export default function Trips() {
   const dispatch = useDispatch();
-  const { tripInfo } = useSelector((state) => state.trips)
-  const {address} = useSelector((state) => state.auth)
-  useEffect(() => {
-    dispatch(fetchCurrentTripId())
-      .unwrap()
-      .then(tripId => {
-        console.log('Trip Id =>', tripId);
-        dispatch(fetchTripThunk({ tripId }));
-      })
-      .catch(error => {
-        toast.error('Falied to load trip: ' + error.message);
-      });
-  }, []);
+  const { data: nextTripId } = useReadContract({
+    ...bodaContractConfig,
+    functionName: "nextTripId",
+  });
+  const newTripId = nextTripId ? String(nextTripId - 1n) : undefined;
+  const {
+    data: tripInfo,
+    error: tripError,
+    isPending: tripPending,
+  } = useReadContract({
+    ...bodaContractConfig,
+    functionName: "getTripDetails",
+    args: nextTripId ? [newTripId] : undefined,
+    enabled: !!newTripId,
+  });
+  console.log("TripInfo: ==>", tripInfo);
 
-  const handleCompleteTrip = async () => {
-    try {
-      if (tripInfo?.client?.toLowerCase() !== address?.toLowerCase()) {
-        console.log('You are not authorized to complete this trip');
-        return;
-      }
-      const tripId = await dispatch(fetchCurrentTripId()).unwrap();
-      await dispatch(fetchCompleteTripThunk({ tripId })).unwrap();
-    } catch (error) {
-      console.log('Failed to complete the trip: ', error.message);
+  useEffect(() => {
+    if (tripInfo) {
+      const formattedTrip = {
+        fare: formatEther(tripInfo.fare.toString()),
+        rider: tripInfo.rider,
+        client: tripInfo.client,
+        distance: tripInfo.distance.toString(),
+        tripId: tripInfo.tripId.toString(),
+        isAccepted: tripInfo.isAccepted,
+        tripStarted: tripInfo.tripStarted,
+        isCompleted: tripInfo.isCompleted,
+        isPaidOut: tripInfo.isPaidOut,
+        pickup: tripInfo.pickup,
+        destination: tripInfo.destination,
+      };
+      dispatch(registerTripEndPoint(formattedTrip));
     }
-  };
-  //   console.log('trip info rider: ', tripInfo);
-  console.log('Type of tripInfo.tripId: ', typeof tripInfo.tripId);
-  const trips = [];
+  }, [tripInfo]);
   return (
     <div>
       <div className="bg-gray-700 text-white p-4 rounded-xl shadow col-span-1 md:col-span-2">
@@ -58,11 +68,11 @@ export default function Trips() {
               </p>
               <p>
                 <span>Fare:</span>
-                <span className="text-blue-500 pl-2">{tripInfo.fare} ETH</span>
+                <span className="text-blue-500 pl-2">{`${formatUnits(tripInfo?.fare) + " AFB"}`}</span>
               </p>
               <p>
                 <span>Completed Status:</span>
-                {tripInfo.isCompleted ? (
+                {tripInfo?.isCompleted ? (
                   <span className="text-green-400 pl-2">✅ Completed</span>
                 ) : (
                   <span className="text-red-400 pl-2">Pending</span>
@@ -70,16 +80,16 @@ export default function Trips() {
               </p>
               <p>
                 <span>Paid Status:</span>
-                {tripInfo.isPaidOut ? (
+                {tripInfo?.isPaidOut ? (
                   <span className="text-green-400 pl-2">✅ Paid</span>
                 ) : (
                   <span className="text-red-400 pl-2">Unpaid</span>
                 )}
               </p>
             </div>
-            {!tripInfo.isCompleted && (
+            {!tripInfo?.isCompleted && (
               <button
-                onClick={handleCompleteTrip}
+                // onClick={handleCompleteTrip}
                 className="bg-purple-600  text-white px-3 py-2 rounded hover:bg-purple-700"
               >
                 Complete Trip

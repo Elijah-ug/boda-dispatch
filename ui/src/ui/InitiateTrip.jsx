@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { bodaContractConfig } from "@/contract/wagmiContractConfig";
 import { fetchInitiateTripThunk } from "@/features/clients/trip/initiateTrip/initiateTripThunk";
 import { Label } from "@radix-ui/react-label";
 import { parseEther } from "ethers";
@@ -8,6 +9,7 @@ import { getDistance } from "geolib";
 import { IPInfoContext } from "ip-info-react";
 import React, { useContext, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import { useWriteContract } from "wagmi";
 
 export default function InitiateTrip() {
   const dispatch = useDispatch();
@@ -89,39 +91,30 @@ export default function InitiateTrip() {
       getDestinationIp();
     }
   }, [destination]);
+
+  const { writeContractAsync: initiateTrip, pending: tripPending } = useWriteContract();
   const handleSubmitDestination = async () => {
     const parsedBaseFare = parseFloat(import.meta.env.VITE_BASEFARE);
     const parsedPerKmRate = parseFloat(import.meta.env.VITE_PERKMRATE);
     const calculatedFare = Math.floor((parsedBaseFare + parseFloat(distance) * parsedPerKmRate) * 100) / 100;
     setFare(calculatedFare);
-    // const distanceMeters = Math.round(parseFloat(route) * 1000);
-    // console.log(
-    //   "parsedBaseFare==>",
-    //   parsedBaseFare,
-    //   "parsedPerKmRate==>",
-    //   parsedPerKmRate,
-    //   "calculatedFare=>",
-    //   calculatedFare
-    // );
-    // console.log(
-    //   "pickup: ",
-    //   pickup,
-    //   "destination: ",
-    //   destination,
-    //   "distance: ",
-    //   distance,
-    //   "calculatedFare",
-    //   calculatedFare
-    // );
+
     if (pickup && destination && distance && calculatedFare) {
-      dispatch(
-        fetchInitiateTripThunk({
-          pickup,
-          destination,
-          distance: Math.round(parseFloat(distance) * 1000),
-          fare: parseEther(calculatedFare.toString()).toString(),
-        })
-      );
+      const parsedDistance = Math.round(parseFloat(distance) * 1000);
+      const parsedFare = parseEther(calculatedFare.toString()).toString();
+      const initiate = await initiate({
+        ...bodaContractConfig,
+        functionName: "initiateTrip",
+        args: [pickup, destination, parsedDistance, parsedFare],
+      });
+      // dispatch(
+      //   fetchInitiateTripThunk({
+      //     pickup,
+      //     destination,
+      //     distance: parsedDistance,
+      //     fare: parsedFare,
+      //   })
+      // );
     }
     // console.log('distanceMeters: ==>', typeof route, route);
     setDestination("");

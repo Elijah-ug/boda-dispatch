@@ -4,7 +4,7 @@ export const fetchAvailableTrips = createAsyncThunk("trips/fetchAvailableTrips",
   try {
     const res = await fetch(import.meta.env.VITE_TRIPS_URL);
     const newTrips = await res.json();
-    console.log(newTrips);
+    // console.log(newTrips);
     return newTrips;
   } catch (error) {
     console.log(error.message);
