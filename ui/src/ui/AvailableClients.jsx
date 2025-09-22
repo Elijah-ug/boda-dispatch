@@ -8,96 +8,97 @@ import { useDispatch, useSelector } from "react-redux";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchAvailableTrips } from "@/features/readData/trips";
 import { acceptTripThunk } from "@/features/riders/trigger/acceptTripThunk";
+import { useAccount, useReadContract, useWriteContract } from "wagmi";
+import { bodaContractConfig } from "@/contract/wagmiContractConfig";
 
 export const AvailableClients = () => {
   const [clients, setClients] = useState([]);
-  // const [copied, setCopied] = useState(false);
-  // const [clientAddress, setClientAddress] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [clientAddress, setClientAddress] = useState("");
   const { newTrips, loading, error } = useSelector((state) => state.newTrip);
   const dispatch = useDispatch();
-  console.log("newTrips==> ", newTrips);
-  // useEffect(() => {
-  //   dispatch(fetchCurrentTripId())
-  //     .unwrap()
-  //     .then((tripId) => {
-  //       console.log("Trip Id =>", tripId);
-  //       dispatch(fetchTripThunk(tripId));
-  //     })
-  //     .catch((error) => {
-  //       toast.error("Falied to load trip: " + error.message);
-  //     });
-  // }, []);
-
-  // const availableClients = async () => {
-  //   try {
-  //     const res = await fetch(import.meta.env.VITE_CLIENT_URL);
-  //     const data = await res.json();
-  //     setClients(data);
-  //     console.log(data);
-  //   } catch (error) {
-  //     console.log(error.message);
-  //   }
-  // };
+  const { address } = useAccount();
   useEffect(() => {
-    // availableClients();
-    // dispatch(fetchAvailableTrips());
-  }, []);
+    console.log("newTrips==> ", newTrips);
+  }, [address]);
+  useEffect(() => {
+    dispatch(fetchAvailableTrips());
+  }, [newTrips]);
   const handleCopyAddress = (addr) => {
     setClientAddress(addr);
     navigator.clipboard.writeText(addr);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
+
+  // const { data: nextTripId } = useReadContract({
+  //     ...bodaContractConfig,
+  //     functionName: "nextTripId",
+  //   });
+  //   const newTripId = nextTripId ? String(nextTripId - 1n) : undefined;
+  const { writeContractAsync: acceptTrip, pending: acceptPending } = useWriteContract();
+  const handleAcceptTrip = async (tripId) => {
+    const accept = await acceptTrip({
+      ...bodaContractConfig,
+      functionName: "acceptTripRequest",
+      args: [tripId],
+    });
+  };
   return (
     <div className="min-h-screen p-3 sm:px-10 text-gray-200">
-      <div className="grid grid-cols-2 sm:grid-cols-3">
-        {clients.length > 0 ? (
-          <Card className="w-xs max-w-lg bg-gray-600 border-none text-gray-200">
-            <CardHeader>
-              <CardTitle className="text-gray-300">Destination</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {/* {clients.map((client)=>
-              
-              )} */}
-            </CardContent>
-            <CardFooter>
-              <Button>Accept Trip</Button>
-            </CardFooter>
-          </Card>
-        ) : (
-          <h3>No clients available</h3>
-        )}
-      </div>
-      {/* <div key={client.id} className="">
-                <div className="flex">
-                <div className="flex items-center gap-2 cursor-pointer">
-                  <span className="">
-                    {tripInfo?.client?.slice(0, 7)}...{tripInfo?.client?.slice(-5)}
-                  </span>
-                  <div onClick={() => handleCopyAddress(tripInfo?.client)} className="">
-                    {clientAddress === tripInfo?.client && copied ? (
-                      <div className="flex items-center text-sm gap-1">
-                        <FaCheck className="text-green-400" />
-                        <span>copied</span>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3">
+        {/* {clients.length > 0 ? ( */}
+        {newTrips.map(
+          (newTrip) =>
+            !newTrip.isAccepted && (
+              <Card key={newTrip.id} className="w-full sm:max-w-lg bg-gray-800 border-none text-gray-200">
+                <CardContent>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2 cursor-pointer">
+                      <span>Client: </span>
+                      <span className="">
+                        {newTrip?.client?.slice(0, 7)}...{newTrip?.client?.slice(-5)}
+                      </span>
+                      <div onClick={() => handleCopyAddress(newTrip?.client)} className="">
+                        {clientAddress === newTrip?.client && copied ? (
+                          <div className="flex items-center text-sm gap-1">
+                            <FaCheck className="text-green-400" />
+                            <span>copied</span>
+                          </div>
+                        ) : (
+                          <FiCopy />
+                        )}
                       </div>
-                    ) : (
-                      <FiCopy />
-                    )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span>Pickup:</span>
+                      <span>{newTrip?.pickup}</span>
+                    </div>
+                    {/*  */}
+                    <div className="flex items-center gap-2">
+                      <span>Destination:</span>
+                      <span>{newTrip?.destination}</span>
+                    </div>
+                    {/*  */}
+                    <div className="flex items-center gap-2">
+                      <span>Distance:</span>
+                      <span>{newTrip?.distance && `${newTrip.distance / 1000 + " Km"}`}</span>
+                    </div>
+                    {/*  */}
+                    <div className="flex items-center gap-2">
+                      <span>Fare:</span>
+                      <span>{newTrip && `${newTrip.fare + " AFB"}`}</span>
+                    </div>
+                    <Button onClick={() => handleAcceptTrip(newTrip.tripId)}>Accept Trip</Button>
                   </div>
-                </div>
-              </div>
-              
-              <div className="flex">
-                <span>Destination:</span>
-                <span></span>
-              </div>
-
-              <div className="flex">
-                <span>Distance:</span>
-                <span>{tripInfo?.distance ? tripInfo.distance / 1000 + "Km" : "N/A"}</span>
-              </div>
-              </div> */}
+                </CardContent>
+              </Card>
+            )
+        )}
+        {/* ) : (
+          <h3>No clients available</h3>
+        )} */}
+      </div>
     </div>
   );
 };

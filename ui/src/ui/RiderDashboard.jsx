@@ -15,7 +15,7 @@ const RiderDashboard = ({ riderData, assignedTrips, onWithdraw }) => {
   const [withdrawAmount, setWithdrawAmount] = useState("");
   // const dispatch = useDispatch();
   // const { riderProfile } = useSelector((state) => state.rider);
-  const { tripInfo } = useSelector((state) => state.trips);
+  // const { tripInfo } = useSelector((state) => state.trips);
   // const { address } = useSelector((state) => state.auth);
   // console.log("riderProfile.isRegistered: ", riderProfile.isRegistered);
 
@@ -41,16 +41,31 @@ const RiderDashboard = ({ riderData, assignedTrips, onWithdraw }) => {
     functionName: "getRiderInfo",
     args: [address],
   });
-  const showTripInfo = riderProfile?.user?.toLowerCase() === tripInfo?.rider?.toLowerCase();
-  console.log("Number(tripInfo.tripId) : " + typeof Number(tripInfo.tripId));
-  console.log("tripInfo.rider: ", tripInfo.rider);
+  const { data: nextTripId } = useReadContract({
+    ...bodaContractConfig,
+    functionName: "nextTripId",
+  });
+  const newTripId = nextTripId ? String(nextTripId - 1n) : undefined;
+  const {
+    data: tripInfo,
+    error: tripError,
+    isPending: tripPending,
+  } = useReadContract({
+    ...bodaContractConfig,
+    functionName: "getTripDetails",
+    args: nextTripId ? [newTripId] : undefined,
+    enabled: !!newTripId,
+  });
+  const showTripInfo = address?.toLowerCase() === tripInfo?.rider?.toLowerCase();
+  // console.log("Number(tripInfo.tripId) : " + typeof Number(tripInfo.tripId));
+  console.log("tripInfo.rider: ", showTripInfo);
 
   return (
     <div className=" min-h-screen px-3 sm:px-10 py-5 sm:py-10 text-white">
       <h1 className="text-3xl font-bold text-center mb-6">Rider Dashboard</h1>
       <div className="flex flex-col gap-6">
         {/* Rider Info Card */}
-        <div className="p-4 rounded-lg shadow flex flex-col sm:flex-row sm:items-center sm:justify-around gap-6 text-amber-400 bg-gray-800">
+        <div className="p-4 rounded-lg shadow flex flex-col sm:flex-row sm:items-center sm:justify-around gap-6 text-amber-400 bg-gray-700">
           <div>
             <h2 className="text-xl font-semibold mb-2 text-white">🏍️ Rider Info</h2>
             <p>
@@ -83,18 +98,18 @@ const RiderDashboard = ({ riderData, assignedTrips, onWithdraw }) => {
             </p>
           </div>
         </div>
-        <div className="grid sm:grid-cols-2 gap-10">
+        <div className="grid sm:grid-cols-2 gap-10 ">
           {/* Withdraw Section */}
           <div className="">
-            <Card className="w-full max-w-lg bg-gray-100/30 text-white">
+            <Card className="w-full max-w-lg bg-gray-700 text-white h-full border-none">
               <CardHeader>
-                <CardTitle>Login to your account</CardTitle>
+                <CardTitle>Withdraw</CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={() => onWithdraw(withdrawAmount)}>
                   <div className="flex flex-col gap-6">
                     <div className="grid gap-2">
-                      <Label htmlFor="email">Email</Label>
+                      {/* <Label htmlFor="email">Email</Label> */}
                       <Input
                         id="email"
                         type="number"
@@ -106,7 +121,7 @@ const RiderDashboard = ({ riderData, assignedTrips, onWithdraw }) => {
                     </div>
                     <div className="grid gap-2">
                       <Button type="submit" className="w-full">
-                        Login
+                        Withdraw
                       </Button>
                     </div>
                   </div>
@@ -117,36 +132,45 @@ const RiderDashboard = ({ riderData, assignedTrips, onWithdraw }) => {
 
           {/* Assigned Trips Section */}
           <div className="">
-            <Card className="w-full max-w-lg bg-gray-100/30 text-white">
+            {showTripInfo? (
+            <Card className="w-full max-w-lg bg-gray-700 text-white h-full border-none">
               <CardHeader>
                 <CardTitle>📦 Recent Assigned Trip Details</CardTitle>
               </CardHeader>
               <CardContent>
-                {!showTripInfo && !riderProfile?.isRegistered ? (
-                  <p className="text-gray-500">No trips assigned yet.</p>
-                ) : (
-                  <div className="border-b py-2 flex justify-between items-center">
+                
+                  <div className="border-b py-2 flex flex-col sm:flex-row sm:justify-between items-center">
                     <div>
                       <p>Trip #{tripInfo?.tripId ? Number(tripInfo.tripId) + 1 : "N/A"}</p>
 
-                      <p>Rider: {tripInfo.rider}</p>
-                      <p>Client: {tripInfo.client}</p>
-                      <p>Fare: {tripInfo.fare} ETH</p>
+                      <p>
+                        Rider: {tripInfo?.rider?.slice(0, 7)}...{tripInfo?.rider?.slice(-5)}
+                      </p>
+                      <p>
+                        Client: {tripInfo?.client?.slice(0, 7)}...{tripInfo?.client?.slice(-5)}
+                      </p>
+                      <p>Fare: {tripInfo?.fare} ETH</p>
                     </div>
                     <div>
                       <span
                         className={`text-sm px-2 py-1 rounded-full ${
-                          riderProfile.isCompleted ? "bg-green-100 text-green-700" : "bg-yellow-200 text-yellow-700"
+                          riderProfile?.isCompleted ? "bg-green-100 text-green-700" : "bg-yellow-200 text-yellow-700"
                         }`}
                       >
-                        {tripInfo.isCompleted ? "Completed" : "In Progress"}
+                        {tripInfo?.isPaidOut
+                          ? "Trip Paid"
+                          : tripInfo?.isCompleted
+                          ? "Trip Completed"
+                          : tripInfo?.isAccepted
+                          ? "Trip Accepted"
+                          : "Not Accepted"}
                       </span>
                     </div>
                   </div>
-                )}
+                
               </CardContent>
             </Card>
-            <h2 className="text-xl font-semibold mb-2"></h2>
+            ): ( <p>You have no trip history</p> ) }
           </div>
         </div>
       </div>

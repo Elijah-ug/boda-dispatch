@@ -26,7 +26,7 @@ export const fetchTripThunk = createAsyncThunk("trips/fetchTripThunk", async (_,
       destination: trip.destination,
     };
     console.log(tripInfo);
-    await dispatch(registerTripEndPoint(tripInfo));
+    // await dispatch(registerTripEndPoint(tripInfo));
     return tripInfo;
   } catch (error) {
     console.error("❌ Error fetching trip info", error.message);
