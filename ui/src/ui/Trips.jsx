@@ -4,10 +4,11 @@ import { fetchCurrentTripId } from "../features/clients/trip/tripData/currentTri
 import { fetchTripThunk } from "../features/clients/trip/tripData/tripThunk";
 import { fetchCompleteTripThunk } from "../features/clients/trip/complete/completeTrip";
 import { toast } from "react-toastify";
-import { useReadContract } from "wagmi";
+import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { bodaContractConfig } from "@/contract/wagmiContractConfig";
 import { registerTripEndPoint } from "@/features/public/tripRoute";
 import { formatEther, formatUnits } from "ethers";
+import { waitForTransactionReceipt } from "viem/actions";
 
 export default function Trips() {
   const dispatch = useDispatch();
@@ -20,14 +21,28 @@ export default function Trips() {
     data: tripInfo,
     error: tripError,
     isPending: tripPending,
+    refetch: refetchTripInfo,
   } = useReadContract({
     ...bodaContractConfig,
     functionName: "getTripDetails",
     args: nextTripId ? [newTripId] : undefined,
     enabled: !!newTripId,
+    watch: true,
   });
   console.log("TripInfo: ==>", tripInfo);
 
+  const { writeContractAsync: completeTrip, pending: completePending } = useWriteContract();
+  const handleCompleteTrip = async () => {
+    const parsedTripId = tripInfo?.tripId.toString();
+    const complete = await completeTrip({
+      ...bodaContractConfig,
+      functionName: "completeTrip",
+      args: [parsedTripId],
+    });
+    await waitForTransactionReceipt(publicClient, { hash: complete });
+    await refetchTripInfo();
+    toast.success("Trip Completed")
+  };
   useEffect(() => {
     if (tripInfo) {
       const formattedTrip = {
@@ -46,6 +61,7 @@ export default function Trips() {
       dispatch(registerTripEndPoint(formattedTrip));
     }
   }, [tripInfo]);
+  // console.log("TripId Type is", typeof tripInfo?.tripId.toString());
   return (
     <div>
       <div className="bg-gray-700 text-white p-4 rounded-xl shadow col-span-1 md:col-span-2">
@@ -53,7 +69,7 @@ export default function Trips() {
         {tripInfo ? (
           <div className="border-b py-2 flex justify-between items-center gap-4">
             <div>
-              <p>Trip #{tripInfo?.tripId ? Number(tripInfo?.tripId) + 1 : null}</p>
+              <p>Trip #{tripInfo && tripInfo?.tripId + 1}</p>
               <p>
                 <span>Rider:</span>
                 <span className="text-blue-400 pl-2">
@@ -80,16 +96,20 @@ export default function Trips() {
               </p>
               <p>
                 <span>Paid Status:</span>
-                {tripInfo?.isPaidOut ? (
-                  <span className="text-green-400 pl-2">✅ Paid</span>
-                ) : (
-                  <span className="text-red-400 pl-2">Unpaid</span>
-                )}
+                {tripInfo?.isPaidOut
+                  ? "✅ Trip Paid"
+                  : tripInfo?.isCompleted
+                  ? "✅ Trip Completed"
+                  : tripInfo?.tripStarted
+                  ? "✅ Trip Started"
+                  : tripInfo?.isAccepted
+                  ? "✅ Trip Accepted"
+                  : "Looking For Rider"}
               </p>
             </div>
-            {!tripInfo?.isCompleted && (
+            {tripInfo?.tripStarted && !tripInfo?.isCompleted && (
               <button
-                // onClick={handleCompleteTrip}
+                onClick={handleCompleteTrip}
                 className="bg-purple-600  text-white px-3 py-2 rounded hover:bg-purple-700"
               >
                 Complete Trip

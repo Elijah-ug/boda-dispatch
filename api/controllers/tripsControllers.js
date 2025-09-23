@@ -2,7 +2,6 @@ import { prisma } from "../prisma/client.js";
 
 export const addTrip = async (req, res) => {
   try {
-    console.log("We gat the data ==>", req.body);
     const {
       fare,
       rider,
