@@ -219,7 +219,6 @@ contract BodaBlocks is
         require(trip.tripStarted, "Trip wasn't started");
 
         trip.isCompleted = true;
-        trip.tripStarted = false;
         // enqueue unpaid completed trip for Automation to process
         if (!trip.isPaidOut) {
             unpaidTripQueue.push(_tripId);

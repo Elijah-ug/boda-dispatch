@@ -9,6 +9,8 @@ import { bodaContractConfig } from "@/contract/wagmiContractConfig";
 import { registerTripEndPoint } from "@/features/public/tripRoute";
 import { formatEther, formatUnits } from "ethers";
 import { waitForTransactionReceipt } from "viem/actions";
+import { Button } from "@/components/ui/button";
+import { wagmiConfig } from "@/wagmiConfig";
 
 export default function Trips() {
   const dispatch = useDispatch();
@@ -32,16 +34,30 @@ export default function Trips() {
   console.log("TripInfo: ==>", tripInfo);
 
   const { writeContractAsync: completeTrip, pending: completePending } = useWriteContract();
-  const handleCompleteTrip = async () => {
-    const parsedTripId = tripInfo?.tripId.toString();
-    const complete = await completeTrip({
-      ...bodaContractConfig,
-      functionName: "completeTrip",
-      args: [parsedTripId],
-    });
-    await waitForTransactionReceipt(publicClient, { hash: complete });
-    await refetchTripInfo();
-    toast.success("Trip Completed")
+  const { writeContractAsync: startTrip, pending: startPending } = useWriteContract();
+
+  const handleTriggerTrip = async (trigger) => {
+    if (trigger === "complete") {
+      const parsedTripId = tripInfo?.tripId.toString();
+      const complete = await completeTrip({
+        ...bodaContractConfig,
+        functionName: "completeTrip",
+        args: [parsedTripId],
+      });
+      await waitForTransactionReceipt(wagmiConfig, { hash: complete });
+      await refetchTripInfo();
+      toast.success("Trip Completed");
+    } else if (trigger === "start") {
+      const parsedTripId = tripInfo?.tripId.toString();
+      const complete = await startTrip({
+        ...bodaContractConfig,
+        functionName: "tripStarted",
+        args: [parsedTripId],
+      });
+      await waitForTransactionReceipt(wagmiConfig, { hash: complete });
+      await refetchTripInfo();
+      toast.success("Trip Completed");
+    }
   };
   useEffect(() => {
     if (tripInfo) {
@@ -107,14 +123,11 @@ export default function Trips() {
                   : "Looking For Rider"}
               </p>
             </div>
-            {tripInfo?.tripStarted && !tripInfo?.isCompleted && (
-              <button
-                onClick={handleCompleteTrip}
-                className="bg-purple-600  text-white px-3 py-2 rounded hover:bg-purple-700"
-              >
-                Complete Trip
-              </button>
-            )}
+            {tripInfo?.tripStarted && !tripInfo?.isCompleted ? (
+              <Button onClick={() => handleTriggerTrip("complete")}>Complete Trip</Button>
+            ) : !tripInfo?.tripStarted && tripInfo?.isAccepted ? (
+              <Button onClick={() => handleTriggerTrip("start")}>Start Trip</Button>
+            ) : null}
           </div>
         ) : (
           <div className="w-50">
