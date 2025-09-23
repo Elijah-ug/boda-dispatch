@@ -10,9 +10,11 @@ import { fetchAvailableTrips } from "@/features/readData/trips";
 import { acceptTripThunk } from "@/features/riders/trigger/acceptTripThunk";
 import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { bodaContractConfig } from "@/contract/wagmiContractConfig";
+import { registerTripEndPoint } from "@/features/public/tripRoute";
+import { formatEther } from "ethers";
 
 export const AvailableClients = () => {
-  const [clients, setClients] = useState([]);
+  const [isAccepted, setIsAccepted] = useState(false);
   const [copied, setCopied] = useState(false);
   const [clientAddress, setClientAddress] = useState("");
   const { newTrips, loading, error } = useSelector((state) => state.newTrip);
@@ -31,19 +33,50 @@ export const AvailableClients = () => {
     setTimeout(() => setCopied(false), 1500);
   };
 
-  // const { data: nextTripId } = useReadContract({
-  //     ...bodaContractConfig,
-  //     functionName: "nextTripId",
-  //   });
-  //   const newTripId = nextTripId ? String(nextTripId - 1n) : undefined;
   const { writeContractAsync: acceptTrip, pending: acceptPending } = useWriteContract();
+
   const handleAcceptTrip = async (tripId) => {
     const accept = await acceptTrip({
       ...bodaContractConfig,
       functionName: "acceptTripRequest",
       args: [tripId],
     });
+    setIsAccepted(true);
   };
+  const { data: nextTripId } = useReadContract({
+    ...bodaContractConfig,
+    functionName: "nextTripId",
+  });
+  const newTripId = nextTripId ? String(nextTripId - 1n) : undefined;
+  const {
+    data: tripInfo,
+    error: tripError,
+    isPending: tripPending,
+  } = useReadContract({
+    ...bodaContractConfig,
+    functionName: "getTripDetails",
+    args: nextTripId ? [newTripId] : undefined,
+    enabled: !!newTripId,
+  });
+  useEffect(() => {
+    if (tripInfo) {
+      const formattedTrip = {
+        fare: formatEther(tripInfo.fare.toString()),
+        rider: tripInfo.rider,
+        client: tripInfo.client,
+        distance: tripInfo.distance.toString(),
+        tripId: tripInfo.tripId.toString(),
+        isAccepted: tripInfo.isAccepted,
+        tripStarted: tripInfo.tripStarted,
+        isCompleted: tripInfo.isCompleted,
+        isPaidOut: tripInfo.isPaidOut,
+        pickup: tripInfo.pickup,
+        destination: tripInfo.destination,
+      };
+      dispatch(registerTripEndPoint(formattedTrip));
+      console.log("Trip Updated: ", formattedTrip);
+    }
+  }, [isAccepted]);
   return (
     <div className="min-h-screen p-3 sm:px-10 text-gray-200">
       <div className="grid sm:grid-cols-2 lg:grid-cols-3">

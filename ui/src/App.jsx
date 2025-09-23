@@ -76,7 +76,17 @@ export default function App() {
               </Routes>
             </div>
 
-            {/* <ToastContainer position="top-right" /> */}
+            <ToastContainer
+              position="top-right"
+              autoClose={4000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              pauseOnHover
+              draggable
+              theme="colored"
+            />
+
             <Footer />
             {/* <Foot /> */}
           </div>
