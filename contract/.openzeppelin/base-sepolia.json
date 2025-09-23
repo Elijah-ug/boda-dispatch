@@ -382,6 +382,381 @@
           ]
         }
       }
+    },
+    "0d730a1ce322e5e11987877590536a76eaf47c80b11cc69cbe80df47c83f5166": {
+      "address": "0x2C2D6F0B2A9310ccDD91284fa21e0e08831bA74F",
+      "txHash": "0xdd8ebc9fc4b88b71b493e36659c370e9e0541876028c2834728856379eacaae1",
+      "layout": {
+        "solcVersion": "0.8.28",
+        "storage": [
+          {
+            "label": "stableToken",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_contract(IERC20)824",
+            "contract": "BodaBlocks",
+            "src": "contracts/BodaBlocks.sol:17"
+          },
+          {
+            "label": "trips",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_uint256,t_struct(Trip)1346_storage)",
+            "contract": "BodaBlocks",
+            "src": "contracts/BodaBlocks.sol:34"
+          },
+          {
+            "label": "nextTripId",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_uint256",
+            "contract": "BodaBlocks",
+            "src": "contracts/BodaBlocks.sol:35"
+          },
+          {
+            "label": "riderProfiles",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_mapping(t_address,t_struct(Rider)1366_storage)",
+            "contract": "BodaBlocks",
+            "src": "contracts/BodaBlocks.sol:46"
+          },
+          {
+            "label": "nextRiderId",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256",
+            "contract": "BodaBlocks",
+            "src": "contracts/BodaBlocks.sol:47"
+          },
+          {
+            "label": "clientProfiles",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_mapping(t_address,t_struct(Client)1384_storage)",
+            "contract": "BodaBlocks",
+            "src": "contracts/BodaBlocks.sol:59"
+          },
+          {
+            "label": "nextClientId",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_uint256",
+            "contract": "BodaBlocks",
+            "src": "contracts/BodaBlocks.sol:60"
+          },
+          {
+            "label": "unpaidTripQueue",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_array(t_uint256)dyn_storage",
+            "contract": "BodaBlocks",
+            "src": "contracts/BodaBlocks.sol:85"
+          },
+          {
+            "label": "unpaidQueueIndex",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_uint256",
+            "contract": "BodaBlocks",
+            "src": "contracts/BodaBlocks.sol:86"
+          },
+          {
+            "label": "platformFee",
+            "offset": 0,
+            "slot": "9",
+            "type": "t_uint256",
+            "contract": "BodaBlocks",
+            "src": "contracts/BodaBlocks.sol:87"
+          },
+          {
+            "label": "percentageFee",
+            "offset": 0,
+            "slot": "10",
+            "type": "t_uint32",
+            "contract": "BodaBlocks",
+            "src": "contracts/BodaBlocks.sol:88"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_struct(InitializableStorage)90_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(OwnableStorage)30_storage": {
+            "label": "struct OwnableUpgradeable.OwnableStorage",
+            "members": [
+              {
+                "label": "_owner",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(ReentrancyGuardStorage)180_storage": {
+            "label": "struct ReentrancyGuardUpgradeable.ReentrancyGuardStorage",
+            "members": [
+              {
+                "label": "_status",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_contract(IERC20)824": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_struct(Client)1384_storage)": {
+            "label": "mapping(address => struct BodaBlocks.Client)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_struct(Rider)1366_storage)": {
+            "label": "mapping(address => struct BodaBlocks.Rider)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(Trip)1346_storage)": {
+            "label": "mapping(uint256 => struct BodaBlocks.Trip)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Client)1384_storage": {
+            "label": "struct BodaBlocks.Client",
+            "members": [
+              {
+                "label": "balance",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "user",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "clientId",
+                "type": "t_uint32",
+                "offset": 20,
+                "slot": "1"
+              },
+              {
+                "label": "isRegistered",
+                "type": "t_bool",
+                "offset": 24,
+                "slot": "1"
+              },
+              {
+                "label": "hasSomeBalance",
+                "type": "t_bool",
+                "offset": 25,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(Rider)1366_storage": {
+            "label": "struct BodaBlocks.Rider",
+            "members": [
+              {
+                "label": "earnings",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "user",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "riderId",
+                "type": "t_uint32",
+                "offset": 20,
+                "slot": "1"
+              },
+              {
+                "label": "completedTrips",
+                "type": "t_uint32",
+                "offset": 24,
+                "slot": "1"
+              },
+              {
+                "label": "totalTrips",
+                "type": "t_uint32",
+                "offset": 28,
+                "slot": "1"
+              },
+              {
+                "label": "isRegistered",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "t_struct(Trip)1346_storage": {
+            "label": "struct BodaBlocks.Trip",
+            "members": [
+              {
+                "label": "fare",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "rider",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "client",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "distance",
+                "type": "t_uint64",
+                "offset": 20,
+                "slot": "2"
+              },
+              {
+                "label": "tripId",
+                "type": "t_uint32",
+                "offset": 28,
+                "slot": "2"
+              },
+              {
+                "label": "isAccepted",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "tripStarted",
+                "type": "t_bool",
+                "offset": 1,
+                "slot": "3"
+              },
+              {
+                "label": "isCompleted",
+                "type": "t_bool",
+                "offset": 2,
+                "slot": "3"
+              },
+              {
+                "label": "isPaidOut",
+                "type": "t_bool",
+                "offset": 3,
+                "slot": "3"
+              },
+              {
+                "label": "pickup",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "destination",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "5"
+              }
+            ],
+            "numberOfBytes": "192"
+          },
+          "t_uint32": {
+            "label": "uint32",
+            "numberOfBytes": "4"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.ReentrancyGuard": [
+            {
+              "contract": "ReentrancyGuardUpgradeable",
+              "label": "_status",
+              "type": "t_uint256",
+              "src": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol:43",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Ownable": [
+            {
+              "contract": "OwnableUpgradeable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:24",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
     }
   }
 }

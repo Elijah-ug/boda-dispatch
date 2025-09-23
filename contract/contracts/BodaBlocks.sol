@@ -219,7 +219,6 @@ contract BodaBlocks is
         require(trip.tripStarted, "Trip wasn't started");
 
         trip.isCompleted = true;
-        trip.tripStarted = false;
         // enqueue unpaid completed trip for Automation to process
         if (!trip.isPaidOut) {
             unpaidTripQueue.push(_tripId);
@@ -281,7 +280,7 @@ contract BodaBlocks is
         returns (bool upkeepNeeded, bytes memory performData){
             uint256 tripsToPay = 0;
             uint256 maxTripsToCheck = 100; // Prevent gas spikes 
-        for (uint256 i = 1; i <= nextTripId && tripsToPay < maxTripsToCheck; i++) {
+        for (uint256 i = 0; i < nextTripId && tripsToPay < maxTripsToCheck; i++) {
             Trip storage trip = trips[i];
             if (trip.isCompleted && !trip.isPaidOut) {
                 tripsToPay ++;
@@ -290,7 +289,7 @@ contract BodaBlocks is
         }
         upkeepNeeded = (tripsToPay > 0);
         performData = abi.encode(tripsToPay);
-        return (false, "");
+        return (upkeepNeeded, performData);
     }
     // performUpkeep will clear the queue entry (set to 0) and advance unpaidQueueIndex when possible,
     // then call rewardTripRiderByFare to process payment.
@@ -299,7 +298,7 @@ contract BodaBlocks is
          uint256 processed = 0;
          uint256 maxTripsToCheck = 100; // Same limit as checkUpkeep
         // find and clear the queued entry (we don't shift the array; we set slot to 0)
-        for (uint256 i = 1; i < nextTripId && processed < tripsToPay && processed < maxTripsToCheck; i++) {
+        for (uint256 i = 0; i < nextTripId && processed < tripsToPay && processed < maxTripsToCheck; i++) {
              Trip storage trip = trips[i];
             if (trip.isCompleted && !trip.isPaidOut) {
                rewardTripRiderByFare(trip.tripId);
